@@ -7,10 +7,10 @@ Rosetta: A Grammar of Graphics for Runtime Code Visualizations
 ---
 Tooling:
 
-- Babel
 - React
+- Babel (for ES6)
 
 To start up the development environment:
 
-  npm run-script babel # start babel watcher
-  npm start            # start local webserver on localhost:8888
+    npm run-script babel # start babel watcher
+    npm start            # start local webserver on localhost:8888

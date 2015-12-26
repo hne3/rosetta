@@ -4,7 +4,7 @@
   "description": "Rosetta: A Grammar of Graphics for Runtime Code Visualizations",
   "scripts": {
     "start": "python -m SimpleHTTPServer 8888",
-    "babel": "babel --presets react,es2015,eslint src/ --watch --out-dir build/ --source-maps"
+    "babel": "babel --presets react,es2015 src/ --watch --out-dir build/ --source-maps"
   },
   "repository": {
     "type": "git",

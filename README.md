@@ -12,5 +12,5 @@ Tooling:
 
 To start up the development environment:
 
-    npm run-script babel # start babel watcher
-    npm start            # start local webserver on localhost:8888
+    npm run babel  # start babel watcher
+    npm start      # start local webserver on localhost:8888

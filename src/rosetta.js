@@ -6,6 +6,7 @@
 /* TODOs
 
 - remember to add 'key' field for object constancy
+- refactor into modules using something like Require JS
 
 */
 

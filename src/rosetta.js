@@ -84,3 +84,15 @@ ReactDOM.render(
            customStyle={{backgroundColor: 'purple'}} />,
   document.getElementById("primitiveDiv3")
 );
+
+ReactDOM.render(
+  <RNumber typeTag="int"
+           data={-123.4567890}
+           renderNumberFunc={(x) => d3.round(x, 0)} />,
+  document.getElementById("primitiveDiv4")
+);
+
+ReactDOM.render(
+  <RSymbol data={"globalX"} />,
+  document.getElementById("primitiveDiv5")
+);

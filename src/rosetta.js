@@ -1,4 +1,14 @@
-// Rosetta classes start with 'R'
+// Rosetta
+// Created on 2015-12-27 by Philip Guo
+
+// Rosetta classes start with 'R' to not conflict with built-in types
+
+/* TODOs
+
+- remember to add 'key' field for object constancy
+
+*/
+
 
 // abstract class
 class RPrimitive extends React.Component {
@@ -18,17 +28,26 @@ class RPrimitive extends React.Component {
       );
     }
   }
+
+  // override to customize style
+  getStyle() {
+    if (this.props.customStyle) {
+      return this.props.customStyle;
+    } else {
+      return {
+        backgroundColor: 'gray'
+      };
+    }
+  }
 }
 
 class RNumber extends RPrimitive {
   renderData() {
-    return String(this.props.data);
-  }
-
-  getStyle() {
-    return {
-      backgroundColor: 'blue'
-    };
+    // d3's formatting functions are good for renderNumberFunc to
+    // control how numbers are rendered
+    return this.props.renderNumberFunc ?
+           this.props.renderNumberFunc(this.props.data) :
+           String(this.props.data); // no renderer
   }
 }
 
@@ -38,42 +57,30 @@ class RString extends RPrimitive {
     // in one single line
     return JSON.stringify(this.props.data);
   }
-
-  getStyle() {
-    return {
-      backgroundColor: 'steelBlue'
-    };
-  }
 }
 
 class RSymbol extends RPrimitive {
   renderData() {
     return this.props.data;
   }
-
-  getStyle() {
-    if (this.props.style) {
-      return this.props.style;
-    } else {
-      return {
-        backgroundColor: 'gray'
-      };
-    }
-  }
 }
 
 
 ReactDOM.render(
-  <RNumber typeTag="unsigned long" data={-1234567890} />,
+  <RNumber typeTag="float"
+           data={123.4567890}
+           renderNumberFunc={(x) => d3.round(x, 3)} />,
   document.getElementById("primitiveDiv1")
 );
 
 ReactDOM.render(
-  <RString typeTag="str" data={"Hello, <b>world!</b>"} />,
+  <RString data={"Hello, <b>world!</b>"} />,
   document.getElementById("primitiveDiv2")
 );
 
 ReactDOM.render(
-  <RSymbol typeTag="bool" style={{backgroundColor: 'purple'}} data={"True"} />,
+  <RSymbol typeTag="bool"
+           data={"True"}
+           customStyle={{backgroundColor: 'purple'}} />,
   document.getElementById("primitiveDiv3")
 );

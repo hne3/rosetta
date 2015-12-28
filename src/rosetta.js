@@ -9,6 +9,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'd3';
 
 import {RNumber, RString, RSymbol} from 'rprimitive';
 

@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "Rosetta: A Grammar of Graphics for Runtime Code Visualizations",
   "scripts": {
-    "start": "python -m SimpleHTTPServer 8888",
-    "webpack": "webpack --progress --colors --watch",
-    "babel": "babel --presets react,es2015 src/ --watch --out-dir build/ --source-maps"
+    "start": "webpack-dev-server --hot --inline",
+    "webpack": "webpack --progress --colors --watch"
   },
   "repository": {
     "type": "git",
@@ -26,6 +25,7 @@
     "babel-loader": "^6.2.0",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
+    "react-hot-loader": "^1.3.0",
     "webpack": "^1.12.9",
     "webpack-dev-server": "^1.14.0"
   }

@@ -12,7 +12,7 @@ module.exports = {
     root: path.resolve('./src'), // needs to be an absolute path
     extensions: ['', '.js']
   },
-  devtool: 'source-map', // generate source helps to aid debugging
+  devtool: 'source-map', // generate source maps to aid debugging
   module: {
     loaders: [
       {
@@ -22,7 +22,7 @@ module.exports = {
         // 2.) babel-loader for invoking Babel using cacheDirectory and
         //     the proper presets
         loaders: ['react-hot-loader',
-                  'babel-loader?cacheDirectory=webpack_cache/,presets[]=react,presets[]=es2015']
+                  'babel-loader?cacheDirectory=webpack_cache/&presets[]=react&presets[]=es2015']
       },
     ]
   }

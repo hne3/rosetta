@@ -3,6 +3,8 @@
 /*
 TODOs:
 - package up CSS and other JS library files such as d3 and underscore
+- set up:
+  https://robots.thoughtbot.com/setting-up-webpack-for-react-and-hot-module-replacement
 
 */
 
@@ -24,7 +26,11 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader?cacheDirectory,presets[]=react,presets[]=es2015'
+        loader: 'babel-loader',
+        query: {
+          cacheDirectory: '.',
+          presets: ['react', 'es2015']
+        }
       },
     ]
   }

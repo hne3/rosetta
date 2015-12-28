@@ -1,10 +1,4 @@
-// ZOMG getting Webpack to work with Babel 6.x
-
-/*
-TODOs:
-- package up CSS and other JS library files such as d3 and underscore
-
-*/
+// ZOMG got Webpack to work with Babel 6.x
 
 var path = require('path');
 

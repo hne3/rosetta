@@ -28,7 +28,7 @@ module.exports = {
         // 2.) babel-loader for invoking Babel using cacheDirectory and
         //     the proper presets
         loaders: ['react-hot-loader',
-                  'babel-loader?cacheDirectory=.,presets[]=react,presets[]=es2015']
+                  'babel-loader?cacheDirectory=webpack_cache/,presets[]=react,presets[]=es2015']
       },
     ]
   }

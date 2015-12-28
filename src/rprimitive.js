@@ -2,13 +2,21 @@
 
 import React from 'react';
 
+var myStyle = {
+  primitive: {
+    backgroundColor: 'red',
+  },
+  typeTag: {
+  }
+};
+
 // abstract class, don't export
 class RPrimitive extends React.Component {
   render() {
     if (this.props.typeTag) {
       return (
-        <div className="primitive">
-          <div className="typeTag">{this.props.typeTag}</div>
+        <div className="primitive" style={myStyle.primitive}>
+          <div className="typeTag" style={myStyle.typeTag}>{this.props.typeTag}</div>
           <div style={this.getStyle()}>{this.renderData()}</div>
         </div>
       );

@@ -8,6 +8,8 @@
 */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
+
 import {RNumber, RString, RSymbol} from 'rprimitive';
 
 ReactDOM.render(

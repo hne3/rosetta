@@ -1,5 +1,11 @@
 // ZOMG getting Webpack to work with Babel 6.x
 
+/*
+TODOs:
+- package up CSS and other JS library files such as d3 and underscore
+
+*/
+
 var path = require('path');
 
 module.exports = {
@@ -18,7 +24,8 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader?cacheDirectory,presets[]=react,presets[]=es2015' },
+        loader: 'babel-loader?cacheDirectory,presets[]=react,presets[]=es2015'
+      },
     ]
   }
 };

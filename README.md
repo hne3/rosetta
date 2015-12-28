@@ -5,12 +5,10 @@ Rosetta: A Grammar of Graphics for Runtime Code Visualizations
 [TODO: write me!]
 
 ---
-Tooling:
+Major pieces of tooling:
 
 - React
-- Babel (for ES6)
+- Babel (for JSX and ES6 support)
+- Webpack (mostly for ES6 module support)
 
-To start up the development environment:
-
-    npm run babel  # start babel watcher
-    npm start      # start local webserver on localhost:8888
+See `package.json` for all dependencies.

@@ -18,124 +18,71 @@ import {RNumber, RString, RSymbol} from 'rprimitive';
 import {RElement} from 'relement';
 import {RCollection} from 'rcollection';
 
-ReactDOM.render(
-  <RNumber typeTag="float"
+
+var f = <RNumber typeTag="float"
+          data={123.4567890}
+          renderNumberFunc={(x) => d3.round(x, 3)} />;
+
+var s = <RString data={"Hello, <b>world!</b>"} />;
+
+var b = <RSymbol typeTag="bool"
+          data={"True"}
+          customStyle={{backgroundColor: 'purple'}} />;
+
+var i = <RNumber typeTag="int"
+          data={-123.4567890}
+          renderNumberFunc={(x) => d3.round(x, 0)} />;
+
+var sym = <RSymbol data={"globalX"} />;
+
+ReactDOM.render(f, document.getElementById("primitiveDiv1"));
+ReactDOM.render(s, document.getElementById("primitiveDiv2"));
+ReactDOM.render(b, document.getElementById("primitiveDiv3"));
+ReactDOM.render(i, document.getElementById("primitiveDiv4"));
+ReactDOM.render(sym, document.getElementById("primitiveDiv5"));
+
+
+var e1 = <RElement isVertical={true}
+           key="e1"
+           eValue="aaa" />;
+
+var e2 = <RElement isVertical={false}
+           key="e2"
+           eValue="bbb" />;
+
+var e3 = <RElement isVertical={true}
+           key="e3"
+           eKey="xxx-key"
+           eValue="xxx-value" />;
+
+var e4 = <RElement isVertical={false}
+           key="e4"
+           eKey="yyy-key"
+           eValue="yyy-value" />;
+
+var e5 = <RElement isVertical={false}
+           key="e5"
+           eKey={<RString data={"Hello, <b>world!</b>"} />}
+           eValue={<RNumber typeTag="float"
            data={123.4567890}
-           renderNumberFunc={(x) => d3.round(x, 3)} />,
-  document.getElementById("primitiveDiv1")
-);
+           renderNumberFunc={(x) => d3.round(x, 3)} />} />;
 
-ReactDOM.render(
-  <RString data={"Hello, <b>world!</b>"} />,
-  document.getElementById("primitiveDiv2")
-);
+ReactDOM.render(e1, document.getElementById("elementDiv1"));
+ReactDOM.render(e2, document.getElementById("elementDiv2"));
+ReactDOM.render(e3, document.getElementById("elementDiv3"));
+ReactDOM.render(e4, document.getElementById("elementDiv4"));
+ReactDOM.render(e5, document.getElementById("elementDiv5"));
 
-ReactDOM.render(
-  <RSymbol typeTag="bool"
-           data={"True"}
-           customStyle={{backgroundColor: 'purple'}} />,
-  document.getElementById("primitiveDiv3")
-);
-
-ReactDOM.render(
-  <RNumber typeTag="int"
-           data={-123.4567890}
-           renderNumberFunc={(x) => d3.round(x, 0)} />,
-  document.getElementById("primitiveDiv4")
-);
-
-ReactDOM.render(
-  <RSymbol data={"globalX"} />,
-  document.getElementById("primitiveDiv5")
-);
-
-
-ReactDOM.render(
-  <RElement isVertical={true}
-            eValue="aaa" />,
-  document.getElementById("elementDiv1")
-);
-
-ReactDOM.render(
-  <RElement isVertical={false}
-            eValue="bbb" />,
-  document.getElementById("elementDiv2")
-);
-
-ReactDOM.render(
-  <RElement isVertical={true}
-            eKey="xxx-key"
-            eValue="xxx-value" />,
-  document.getElementById("elementDiv3")
-);
-
-ReactDOM.render(
-  <RElement isVertical={false}
-            eKey="yyy-key"
-            eValue="yyy-value" />,
-  document.getElementById("elementDiv4")
-);
-
-ReactDOM.render(
-  <RElement isVertical={false}
-            eKey={<RString data={"Hello, <b>world!</b>"} />}
-            eValue={<RNumber typeTag="float"
-                   data={123.4567890}
-                   renderNumberFunc={(x) => d3.round(x, 3)} />}
-  />,
-  document.getElementById("elementDiv5")
-);
+var eLst = [e1, e2, e3, e4, e5];
 
 ReactDOM.render(
   <RCollection layout="HorizontalLayout" name="array">
-
-    <RElement isVertical={true}
-              eValue="aaa" />
-
-    <RElement isVertical={false}
-              eValue="bbb" />
-
-    <RElement isVertical={true}
-              eKey="xxx-key"
-              eValue="xxx-value" />
-
-    <RElement isVertical={false}
-              eKey="yyy-key"
-              eValue="yyy-value" />
-
-    <RElement isVertical={false}
-              eKey={<RString data={"Hello, <b>world!</b>"} />}
-              eValue={<RNumber typeTag="float"
-                     data={123.4567890}
-                     renderNumberFunc={(x) => d3.round(x, 3)} />}
-    />
+    {eLst}
   </RCollection>,
-  document.getElementById("collectionDiv1")
-);
+  document.getElementById("collectionDiv1"));
 
 ReactDOM.render(
   <RCollection layout="VerticalLayout" name="dict">
-
-    <RElement isVertical={true}
-              eValue="aaa" />
-
-    <RElement isVertical={false}
-              eValue="bbb" />
-
-    <RElement isVertical={true}
-              eKey="xxx-key"
-              eValue="xxx-value" />
-
-    <RElement isVertical={false}
-              eKey="yyy-key"
-              eValue="yyy-value" />
-
-    <RElement isVertical={false}
-              eKey={<RString data={"Hello, <b>world!</b>"} />}
-              eValue={<RNumber typeTag="float"
-                     data={123.4567890}
-                     renderNumberFunc={(x) => d3.round(x, 3)} />}
-    />
+    {eLst}
   </RCollection>,
-  document.getElementById("collectionDiv2")
-);
+  document.getElementById("collectionDiv2"));

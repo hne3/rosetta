@@ -42,30 +42,33 @@ ReactDOM.render(i, document.getElementById("primitiveDiv4"));
 ReactDOM.render(sym, document.getElementById("primitiveDiv5"));
 
 
-var e1 = <RElement isVertical={true}
-           key="e1"
-           eValue="aaa" />;
+var e1 = <RElement isVertical={true} key="e1">
+           {s}
+           {f}
+         </RElement>;
 
-var e2 = <RElement isVertical={false}
-           key="e2"
-           eValue="bbb" />;
+var e2 = <RElement isVertical={false} key="e2">
+           {s}
+           {i}
+         </RElement>
 
-var e3 = <RElement isVertical={true}
-           key="e3"
-           eKey="xxx-key"
-           eValue="xxx-value" />;
+var e3 = <RElement isVertical={true} key="e3">
+           {sym}
+           {b}
+         </RElement>
 
-var e4 = <RElement isVertical={false}
-           key="e4"
-           eKey="yyy-key"
-           eValue="yyy-value" />;
+var e4 = <RElement isVertical={false} key="e4">
+           {sym}
+           {i}
+         </RElement>
 
-var e5 = <RElement isVertical={false}
-           key="e5"
-           eKey={<RString data={"Hello, <b>world!</b>"} />}
-           eValue={<RNumber typeTag="float"
-           data={123.4567890}
-           renderNumberFunc={(x) => d3.round(x, 3)} />} />;
+var e5 = <RElement isVertical={false} key="e5">
+           <RString data={"Hello, <b>world!</b>"} />
+
+           <RNumber typeTag="float"
+             data={123.4567890}
+             renderNumberFunc={(x) => d3.round(x, 3)} />
+         </RElement>
 
 ReactDOM.render(e1, document.getElementById("elementDiv1"));
 ReactDOM.render(e2, document.getElementById("elementDiv2"));

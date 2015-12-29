@@ -1,50 +1,40 @@
 // Rosetta classes start with 'R' so as not to conflict with built-in types
 
-/*
-TODOs:
-  - should RElement contain keys/values as children nodes in the tree,
-    or use attributes in this.props?
-*/
-
 import React from 'react';
 
 export class RElement extends React.Component {
   render() {
+    // should have exactly 1 or 2 children
+    // - 1 child:    simply a value
+    // - 2 children: a key-value pair
+    var nc = React.Children.count(this.props.children);
+    console.assert(nc === 1 || nc === 2);
+
     if (this.props.isVertical) {
-      var myKey = (this.props.eKey ?
-        <tr>
-          <td>[key: {this.props.eKey}]</td>
-        </tr>
-        : undefined);
+      var body = React.Children.map(this.props.children, (c) => {
+        return <tr><td>[body: {c} ]</td></tr>;
+      });
 
       return (
         <table>
           <tbody>
-          <tr>
-            <td>[index]</td>
-          </tr>
-          {myKey}
-          <tr>
-            <td>[value: {this.props.eValue}]</td>
-          </tr>
-          <tr>
-            <td>[memaddr]</td>
-          </tr>
+          <tr><td>[index]</td></tr>
+          {body}
+          <tr><td>[memaddr]</td></tr>
           </tbody>
         </table>
       );
     } else {
-      var myKey = (this.props.eKey ?
-          <td>[key: {this.props.eKey}]</td>
-        : undefined);
+      var body = React.Children.map(this.props.children, (c) => {
+        return <td>[body: {c} ]</td>;
+      });
 
       return (
         <table>
           <tbody>
           <tr>
             <td>[index]</td>
-            {myKey}
-            <td>[value: {this.props.eValue}]</td>
+            {body}
             <td>[memaddr]</td>
           </tr>
           </tbody>

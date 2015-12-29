@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom';
 import 'd3';
 
 import {RNumber, RString, RSymbol} from 'rprimitive';
+import {RElement} from 'relement';
 
 ReactDOM.render(
   <RNumber typeTag="float"
@@ -42,4 +43,41 @@ ReactDOM.render(
 ReactDOM.render(
   <RSymbol data={"globalX"} />,
   document.getElementById("primitiveDiv5")
+);
+
+
+ReactDOM.render(
+  <RElement isVertical={true}
+            eValue="aaa" />,
+  document.getElementById("elementDiv1")
+);
+
+ReactDOM.render(
+  <RElement isVertical={false}
+            eValue="bbb" />,
+  document.getElementById("elementDiv2")
+);
+
+ReactDOM.render(
+  <RElement isVertical={true}
+            eKey="xxx-key"
+            eValue="xxx-value" />,
+  document.getElementById("elementDiv3")
+);
+
+ReactDOM.render(
+  <RElement isVertical={false}
+            eKey="yyy-key"
+            eValue="yyy-value" />,
+  document.getElementById("elementDiv4")
+);
+
+ReactDOM.render(
+  <RElement isVertical={false}
+            eKey={<RString data={"Hello, <b>world!</b>"} />}
+            eValue={<RNumber typeTag="float"
+                   data={123.4567890}
+                   renderNumberFunc={(x) => d3.round(x, 3)} />}
+  />,
+  document.getElementById("elementDiv5")
 );

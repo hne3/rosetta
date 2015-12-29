@@ -1,5 +1,11 @@
 // Rosetta classes start with 'R' so as not to conflict with built-in types
 
+/*
+TODOs:
+  - should RElement contain keys/values as children nodes in the tree,
+    or use attributes in this.props?
+*/
+
 import React from 'react';
 
 export class RElement extends React.Component {

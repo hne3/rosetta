@@ -1,0 +1,36 @@
+/* TODO: look into replacing with pure CSS in JS, the React way */
+
+.element {
+  border: 1px solid red;
+  display: table;
+}
+
+div.elementIndex,
+div.elementBody,
+div.elementAddr {
+  background-color: #ccc;
+  display: table-row;
+}
+
+span.elementIndex,
+span.elementBody,
+span.elementAddr {
+  background-color: #ccc;
+  display: table-cell;
+}
+
+.rcollection {
+
+}
+
+.collectionTable {
+  display: table;
+}
+
+div.collectionElt {
+  display: table-row;
+}
+
+span.collectionElt {
+  display: table-cell;
+}

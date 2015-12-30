@@ -35,31 +35,25 @@ export class RElement extends React.Component {
 
     if (this.props.isVertical) {
       var body = React.Children.map(this.props.children,
-                                    (c) => <tr><td>{c}</td></tr>);
+                                    (c) => <div className="elementBody">{c}</div>);
 
       return (
-        <table className="element" style={myStyle.element}>
-          <tbody>
-          <tr><td style={myStyle.index}>idx</td></tr>
+        <div className="element" style={myStyle.element}>
+          <div className="elementIndex" style={myStyle.index}>idx</div>
           {body}
-          <tr><td style={myStyle.memAddr}>0x1234</td></tr>
-          </tbody>
-        </table>
+          <div className="elementAddr" style={myStyle.memAddr}>0x1234</div>
+        </div>
       );
     } else {
       var body = React.Children.map(this.props.children,
-                                    (c) => <td>{c}</td>);
+                                    (c) => <span className="elementBody">{c}</span>);
 
       return (
-        <table className="element" style={myStyle.element}>
-          <tbody>
-          <tr>
-            <td style={myStyle.index}>idx</td>
+        <div className="element" style={myStyle.element}>
+            <span className="elementIndex" style={myStyle.index}>idx</span>
             {body}
-            <td style={myStyle.memAddr}>0x1234</td>
-          </tr>
-          </tbody>
-        </table>
+            <span className="elementAddr" style={myStyle.memAddr}>0x1234</span>
+        </div>
       );
     }
   }

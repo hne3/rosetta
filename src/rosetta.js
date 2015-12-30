@@ -52,8 +52,8 @@ var e2 = <RElement isVertical={false} key="e2">
          </RElement>
 
 var e3 = <RElement isVertical={true} key="e3">
-           {sym}
            {b}
+           {sym}
          </RElement>
 
 var e4 = <RElement isVertical={false} key="e4">
@@ -62,11 +62,15 @@ var e4 = <RElement isVertical={false} key="e4">
          </RElement>
 
 var e5 = <RElement isVertical={false} key="e5">
-           <RString data={"Hello, <b>world!</b>"} />
-
            <RNumber typeTag="float"
              data={123.4567890}
              renderNumberFunc={(x) => d3.round(x, 3)} />
+           <RString data={"Hello, <b>world!</b>"} />
+         </RElement>
+
+var e6 = <RElement isVertical={true} key="e6">
+           {sym}
+           {i}
          </RElement>
 
 ReactDOM.render(e1, document.getElementById("elementDiv1"));
@@ -74,17 +78,16 @@ ReactDOM.render(e2, document.getElementById("elementDiv2"));
 ReactDOM.render(e3, document.getElementById("elementDiv3"));
 ReactDOM.render(e4, document.getElementById("elementDiv4"));
 ReactDOM.render(e5, document.getElementById("elementDiv5"));
-
-var eLst = [e1, e2, e3, e4, e5];
+ReactDOM.render(e6, document.getElementById("elementDiv6"));
 
 ReactDOM.render(
   <RCollection layout="HorizontalLayout" name="array">
-    {eLst}
+    {[e1, e3, e6]}
   </RCollection>,
   document.getElementById("collectionDiv1"));
 
 ReactDOM.render(
   <RCollection layout="VerticalLayout" name="dict">
-    {eLst}
+    {[e2, e4, e5]}
   </RCollection>,
   document.getElementById("collectionDiv2"));

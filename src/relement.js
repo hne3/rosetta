@@ -1,8 +1,5 @@
 // Rosetta classes start with 'R' so as not to conflict with built-in types
 
-// TODOs:
-// - use defaultProps to set default style prop that can be overriden
-
 import React from 'react';
 
 var myStyle = {
@@ -27,12 +24,7 @@ var myStyle = {
 
 export class RElement extends React.Component {
   render() {
-    // should have exactly 1 or 2 children
-    // - 1 child:    simply a value
-    // - 2 children: a key-value pair
-    var nc = React.Children.count(this.props.children);
-    console.assert(nc === 1 || nc === 2);
-
+    // TODO: render a hanSolo element all by its lonesome :)
     if (this.props.isVertical) {
       var body = React.Children.map(this.props.children,
                                     (c) => <div className="elementBody">{c}</div>);
@@ -58,3 +50,8 @@ export class RElement extends React.Component {
     }
   }
 }
+
+RElement.defaultProps = {
+  index: 'idx',
+  memAddr: '0xADDR',
+};

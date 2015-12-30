@@ -1,5 +1,8 @@
 // Rosetta classes start with 'R' so as not to conflict with built-in types
 
+// TODOs:
+// - use defaultProps to set default style prop that can be overriden
+
 import React from 'react';
 
 var myStyle = {

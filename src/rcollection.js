@@ -1,16 +1,31 @@
 // Rosetta classes start with 'R' so as not to conflict with built-in types
 
+// TODOs:
+// - use defaultProps to set default style prop that can be overriden
+
 import React from 'react';
+
+var myStyle = {
+  name: {
+    fontSize: '8pt',
+    color: '#555',
+    marginBottom: 2,
+  },
+  collection: {
+    fontFamily: 'verdana, arial, helvetica, sans-serif',
+  },
+};
+
 
 export class RCollection extends React.Component {
   render() {
     if (this.props.layout === 'HorizontalLayout') {
-      var res = React.Children.map(this.props.children, (c) => {
-        return <td>{c}</td>;
-      });
+      var res = React.Children.map(this.props.children,
+                                  (c) => <td>{c}</td>);
+
       return (
-        <div>
-          <div>{this.props.name}</div>
+        <div className="rcollection" style={myStyle.collection}>
+          <div style={myStyle.name}>{this.props.name}</div>
           <table>
             <tbody>
               <tr>
@@ -21,12 +36,12 @@ export class RCollection extends React.Component {
         </div>
       );
     } else if (this.props.layout === 'VerticalLayout') {
-      var res = React.Children.map(this.props.children, (c) => {
-        return <tr><td>{c}</td></tr>;
-      });
+      var res = React.Children.map(this.props.children,
+                                   (c) => <tr><td>{c}</td></tr>);
+
       return (
-        <div>
-          <div>{this.props.name}</div>
+        <div className="rcollection" style={myStyle.collection}>
+          <div style={myStyle.name}>{this.props.name}</div>
           <table>
             <tbody>
               {res}

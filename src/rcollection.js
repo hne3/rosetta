@@ -9,14 +9,20 @@ import _ from 'underscore';
 
 
 var myStyle = {
+  rcollection: {
+    fontFamily: 'verdana, arial, helvetica, sans-serif',
+  },
   name: {
     fontSize: '8pt',
     color: '#555',
     marginBottom: 2,
   },
-  collection: {
-    fontFamily: 'verdana, arial, helvetica, sans-serif',
-  },
+  collectionTable: {},
+  indexTd: {},
+  keyTd: {},
+  valueTd: {},
+  addrTd: {},
+  gridCellTd: {},
 };
 
 
@@ -26,25 +32,25 @@ export class RCollection extends React.Component {
       // render each part of each element separately so that table rows
       // and columns align properly across elements ...
       return (
-        <div className="rcollection" style={myStyle.collection}>
+        <div style={myStyle.rcollection}>
           <div style={myStyle.name}>{this.props.name}</div>
-          <table>
+          <table style={myStyle.collectionTable}>
             <tbody>
               <tr>
               {this.props.elts.map((c, i) =>
-                <td key={c.key}>{c.props.index}</td>)}
+                <td style={myStyle.indexTd} key={c.key}>{c.props.index}</td>)}
               </tr>
               <tr>
               {this.props.elts.map((c, i) =>
-                <td key={c.key}>{c.props.k}</td>)}
+                <td style={myStyle.keyTd} key={c.key}>{c.props.k}</td>)}
               </tr>
               <tr>
               {this.props.elts.map((c, i) =>
-                <td key={c.key}>{c.props.v}</td>)}
+                <td style={myStyle.valueTd} key={c.key}>{c.props.v}</td>)}
               </tr>
               <tr>
               {this.props.elts.map((c, i) =>
-                <td key={c.key}>{c.props.memAddr}</td>)}
+                <td style={myStyle.addrTd} key={c.key}>{c.props.memAddr}</td>)}
               </tr>
             </tbody>
           </table>
@@ -54,16 +60,16 @@ export class RCollection extends React.Component {
       // render each part of each element separately so that table rows
       // and columns align properly across elements ...
       return (
-        <div className="rcollection" style={myStyle.collection}>
+        <div style={myStyle.rcollection}>
           <div style={myStyle.name}>{this.props.name}</div>
-          <table>
+          <table style={myStyle.collectionTable}>
             <tbody>
             {this.props.elts.map((c, i) =>
               <tr key={c.key}>
-                <td>{c.props.index}</td>
-                <td>{c.props.k}</td>
-                <td>{c.props.v}</td>
-                <td>{c.props.memAddr}</td>
+                <td style={myStyle.indexTd}>{c.props.index}</td>
+                <td style={myStyle.keyTd}>{c.props.k}</td>
+                <td style={myStyle.valueTd}>{c.props.v}</td>
+                <td style={myStyle.addrTd}>{c.props.memAddr}</td>
               </tr>)}
             </tbody>
           </table>
@@ -86,7 +92,7 @@ export class RCollection extends React.Component {
             _.range(ncols).map((c, j) => {
               var ret = <td key={j}>[EMPTY]</td>;
               if (idx < this.props.elts.length) {
-                ret = <td key={j}>{this.props.elts[idx]}</td>;
+                ret = <td style={myStyle.gridCellTd} key={j}>{this.props.elts[idx]}</td>;
               }
               idx++;
               return ret;
@@ -96,9 +102,9 @@ export class RCollection extends React.Component {
       });
 
       return (
-        <div className="rcollection" style={myStyle.collection}>
+        <div style={myStyle.rcollection}>
           <div style={myStyle.name}>{this.props.name}</div>
-          <table>
+          <table style={myStyle.collectionTable}>
             <tbody>
               {tblBody}
             </tbody>

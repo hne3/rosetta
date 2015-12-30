@@ -3,10 +3,10 @@
 import React from 'react';
 
 var myStyle = {
-  element: {
+  relement: {
     fontFamily: 'verdana, arial, helvetica, sans-serif',
   },
-  index: {
+  indexTd: {
     /*
     paddingLeft: 4,
     paddingTop: 2,
@@ -15,7 +15,9 @@ var myStyle = {
     fontSize: '8pt',
     color: '#777',
   },
-  memAddr: {
+  keyTd: {},
+  valueTd: {},
+  addrTd: {
     fontSize: '8pt',
     color: '#777',
   },
@@ -28,24 +30,24 @@ export class RElement extends React.Component {
   render() {
     if (this.props.isVertical) {
       return (
-        <table>
+        <table style={myStyle.relement}>
           <tbody>
-            <tr><td className="elementIndex" style={myStyle.index}>idx</td></tr>
-            <tr><td className="elementKey">{this.props.k}</td></tr>
-            <tr><td className="elementValue">{this.props.v}</td></tr>
-            <tr><td className="elementAddr" style={myStyle.memAddr}>0x1234</td></tr>
+            <tr><td style={myStyle.indexTd}>idx</td></tr>
+            <tr><td style={myStyle.keyTd}>{this.props.k}</td></tr>
+            <tr><td style={myStyle.valueTd}>{this.props.v}</td></tr>
+            <tr><td style={myStyle.addrTd}>0x1234</td></tr>
           </tbody>
         </table>
       );
     } else {
       return (
-        <table>
+        <table style={myStyle.relement}>
           <tbody>
             <tr>
-              <td className="elementIndex" style={myStyle.index}>idx</td>
-              <td className="elementKey">{this.props.k}</td>
-              <td className="elementValue">{this.props.v}</td>
-              <td className="elementAddr" style={myStyle.memAddr}>0x1234</td>
+              <td style={myStyle.indexTd}>idx</td>
+              <td style={myStyle.keyTd}>{this.props.k}</td>
+              <td style={myStyle.valueTd}>{this.props.v}</td>
+              <td style={myStyle.addrTd}>0x1234</td>
             </tr>
           </tbody>
         </table>

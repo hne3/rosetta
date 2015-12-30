@@ -23,14 +23,14 @@ class RPrimitive extends React.Component {
   render() {
     if (this.props.typeTag) {
       return (
-        <div className="primitive" style={myStyle.primitive}>
-          <div className="typeTag" style={myStyle.typeTag}>{this.props.typeTag}</div>
+        <div style={myStyle.primitive}>
+          <div style={myStyle.typeTag}>{this.props.typeTag}</div>
           <div style={this.getStyle()}>{this.renderData()}</div>
         </div>
       );
     } else {
       return (
-        <div className="primitive" style={myStyle.primitive}>
+        <div style={myStyle.primitive}>
           <div style={this.getStyle()}>{this.renderData()}</div>
         </div>
       );

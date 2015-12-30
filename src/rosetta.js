@@ -26,8 +26,7 @@ var f = <RNumber typeTag="float"
 var s = <RString data={"Hello, <b>world!</b>"} />;
 
 var b = <RSymbol typeTag="bool"
-          data={"True"}
-          customStyle={{backgroundColor: 'purple'}} />;
+          data={"True"} />;
 
 var i = <RNumber typeTag="int"
           data={-123.4567890}

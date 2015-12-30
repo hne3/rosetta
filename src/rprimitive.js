@@ -4,11 +4,16 @@ import React from 'react';
 
 var myStyle = {
   primitive: {
-    backgroundColor: 'red',
+    fontFamily: 'verdana, arial, helvetica, sans-serif',
+    fontSize: '10pt',
   },
   typeTag: {
+    color: '#777',
+    fontSize: '8pt',
+    marginBottom: 2,
   }
 };
+
 
 // abstract class, don't export
 class RPrimitive extends React.Component {
@@ -29,15 +34,8 @@ class RPrimitive extends React.Component {
     }
   }
 
-  // override to customize style
   getStyle() {
-    if (this.props.customStyle) {
-      return this.props.customStyle;
-    } else {
-      return {
-        backgroundColor: 'gray'
-      };
-    }
+    return {}; // null
   }
 }
 
@@ -56,6 +54,13 @@ export class RString extends RPrimitive {
     // to add quotes and escape characters to keep the string rendered
     // in one single line
     return JSON.stringify(this.props.data);
+  }
+
+  getStyle() {
+    return {
+      fontFamily: 'Andale mono, monospace',
+      whiteSpace: 'nowrap',
+    };
   }
 }
 

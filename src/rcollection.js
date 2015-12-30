@@ -14,6 +14,9 @@ var myStyle = {
   collection: {
     fontFamily: 'verdana, arial, helvetica, sans-serif',
   },
+  collectionTd: {
+    verticalAlign: 'top',
+  },
 };
 
 
@@ -21,7 +24,7 @@ export class RCollection extends React.Component {
   render() {
     if (this.props.layout === 'HorizontalLayout') {
       var res = React.Children.map(this.props.children,
-                                  (c) => <td>{c}</td>);
+                                  (c) => <td style={myStyle.collectionTd}>{c}</td>);
 
       return (
         <div className="rcollection" style={myStyle.collection}>
@@ -37,7 +40,7 @@ export class RCollection extends React.Component {
       );
     } else if (this.props.layout === 'VerticalLayout') {
       var res = React.Children.map(this.props.children,
-                                   (c) => <tr><td>{c}</td></tr>);
+                                   (c) => <tr><td style={myStyle.collectionTd}>{c}</td></tr>);
 
       return (
         <div className="rcollection" style={myStyle.collection}>

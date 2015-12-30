@@ -23,6 +23,8 @@ var myStyle = {
 export class RCollection extends React.Component {
   render() {
     if (this.props.layout === 'HorizontalLayout') {
+      // render each part of each element separately so that table rows
+      // and columns align properly across elements ...
       return (
         <div className="rcollection" style={myStyle.collection}>
           <div style={myStyle.name}>{this.props.name}</div>
@@ -49,6 +51,8 @@ export class RCollection extends React.Component {
         </div>
       );
     } else if (this.props.layout === 'VerticalLayout') {
+      // render each part of each element separately so that table rows
+      // and columns align properly across elements ...
       return (
         <div className="rcollection" style={myStyle.collection}>
           <div style={myStyle.name}>{this.props.name}</div>
@@ -66,6 +70,8 @@ export class RCollection extends React.Component {
         </div>
       );
     } else if (this.props.layout === 'GridLayout') {
+      // use this.props.ncols to determine number of columns in grid,
+      // then render each element inside as a solo element
       console.assert(this.props.ncols > 0); // make sure this is positive!
       var ncols = this.props.ncols;
       var nrows = Math.floor((this.props.elts.length - 1) / ncols) + 1;
@@ -89,8 +95,6 @@ export class RCollection extends React.Component {
           </tr>);
       });
 
-      // use this.props.ncols to determine number of columns in grid,
-      // then render each element inside as a solo element
       return (
         <div className="rcollection" style={myStyle.collection}>
           <div style={myStyle.name}>{this.props.name}</div>

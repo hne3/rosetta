@@ -5,32 +5,9 @@
   display: table;
 }
 
-div.elementIndex,
-div.elementBody,
-div.elementAddr {
+.elementIndex,
+.elementKey,
+.elementValue,
+.elementAddr {
   background-color: #ccc;
-  display: table-row;
-}
-
-span.elementIndex,
-span.elementBody,
-span.elementAddr {
-  background-color: #ccc;
-  display: table-cell;
-}
-
-.rcollection {
-
-}
-
-.collectionTable {
-  display: table;
-}
-
-div.collectionElt {
-  display: table-row;
-}
-
-span.collectionElt {
-  display: table-cell;
 }

@@ -2,6 +2,26 @@
 
 import React from 'react';
 
+var myStyle = {
+  element: {
+
+  },
+  index: {
+    /*
+    paddingLeft: 4,
+    paddingTop: 2,
+    paddingBottom: 3,
+    */
+    fontSize: '8pt',
+    color: '#777',
+  },
+  memAddr: {
+    fontSize: '8pt',
+    color: '#777',
+  },
+};
+
+
 export class RElement extends React.Component {
   render() {
     // should have exactly 1 or 2 children
@@ -11,31 +31,29 @@ export class RElement extends React.Component {
     console.assert(nc === 1 || nc === 2);
 
     if (this.props.isVertical) {
-      var body = React.Children.map(this.props.children, (c) => {
-        return <tr><td>[body: {c} ]</td></tr>;
-      });
+      var body = React.Children.map(this.props.children,
+                                    (c) => <tr><td>{c}</td></tr>);
 
       return (
-        <table>
+        <table className="element" style={myStyle.element}>
           <tbody>
-          <tr><td>[index]</td></tr>
+          <tr><td style={myStyle.index}>idx</td></tr>
           {body}
-          <tr><td>[memaddr]</td></tr>
+          <tr><td style={myStyle.memAddr}>0x1234</td></tr>
           </tbody>
         </table>
       );
     } else {
-      var body = React.Children.map(this.props.children, (c) => {
-        return <td>[body: {c} ]</td>;
-      });
+      var body = React.Children.map(this.props.children,
+                                    (c) => <td>{c}</td>);
 
       return (
-        <table>
+        <table className="element" style={myStyle.element}>
           <tbody>
           <tr>
-            <td>[index]</td>
+            <td style={myStyle.index}>idx</td>
             {body}
-            <td>[memaddr]</td>
+            <td style={myStyle.memAddr}>0x1234</td>
           </tr>
           </tbody>
         </table>

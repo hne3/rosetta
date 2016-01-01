@@ -13,6 +13,10 @@ import 'd3';
 
 //import _ from 'underscore';
 //console.log(_);
+// wow command-line bullshittery:
+// https://github.com/sporritt/jsPlumb/issues/399
+// reference as jsPlumb after npm installing script-loader and imports-loader
+import plumb from 'imports?this=>window!script!../node_modules/jsplumb/dist/js/jsPlumb-2.0.3-min.js';
 
 import {RNumber, RString, RSymbol} from 'rprimitive';
 import {RElement} from 'relement';

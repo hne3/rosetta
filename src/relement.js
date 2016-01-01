@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+// use the CSS-in-JS approach:
+// http://blog.vjeux.com/2014/javascript/react-css-in-js-nationjs.html
 var myStyle = {
   relement: {
     fontFamily: 'verdana, arial, helvetica, sans-serif',

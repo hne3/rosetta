@@ -4,10 +4,10 @@
 // - use defaultProps to set default style prop that can be overriden
 
 import React from 'react';
-
 import _ from 'underscore';
 
-
+// use the CSS-in-JS approach:
+// http://blog.vjeux.com/2014/javascript/react-css-in-js-nationjs.html
 var myStyle = {
   rcollection: {
     fontFamily: 'verdana, arial, helvetica, sans-serif',

@@ -13,14 +13,11 @@ import 'd3';
 
 //import _ from 'underscore';
 //console.log(_);
-// wow command-line bullshittery:
-// https://github.com/sporritt/jsPlumb/issues/399
-// reference as jsPlumb after npm installing script-loader and imports-loader
-import plumb from 'imports?this=>window!script!../node_modules/jsplumb/dist/js/jsPlumb-2.0.3-min.js';
 
-import {RNumber, RString, RSymbol} from 'rprimitive';
+import {RNumber, RString, RSymbol, RPointer} from 'rprimitive';
 import {RElement} from 'relement';
 import {RCollection} from 'rcollection';
+import {StepVisualizer} from 'stepVisualizer';
 
 
 var f = <RNumber typeTag="float"
@@ -36,6 +33,9 @@ var i = <RNumber typeTag="int"
           data={-123.4567890}
           renderNumberFunc={(x) => d3.round(x, 0)} />;
 
+var p1 = <RPointer typeTag="ptr" data={{start: 'fooId', end: 'barId'}} />;
+var p2 = <RPointer typeTag="ptr" data={{start: 'foo2Id', end: 'bar2Id'}} />;
+
 var sym = <RSymbol data={"globalX"} />;
 
 ReactDOM.render(f, document.getElementById("primitiveDiv1"));
@@ -49,9 +49,9 @@ var e1 = <RElement isVertical={true} key="e1" k={s} v={f} />;
 
 var e2 = <RElement isVertical={false} key="e2" k={s} v={i} />;
 
-var e3 = <RElement isVertical={true} key="e3" k={b} v={sym} />;
+var e3 = <RElement isVertical={true} key="e3" k={sym} v={p1} />;
 
-var e4 = <RElement isVertical={false} key="e4" k={sym} v={i} />;
+var e4 = <RElement isVertical={false} key="e4" k={sym} v={p2} />;
 
 var e5 = <RElement isVertical={false} key="e5"
            k={<RNumber typeTag="float"
@@ -81,3 +81,7 @@ ReactDOM.render(
     ncols={3}
     elts={[e1, e2, e3, e4, e5]} />,
   document.getElementById("collectionDiv3"));
+
+var sv = <StepVisualizer></StepVisualizer>
+
+ReactDOM.render(sv, document.getElementById("stepViz"));

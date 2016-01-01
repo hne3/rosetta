@@ -16,7 +16,10 @@ var myStyle = {
     color: '#777',
     fontSize: '8pt',
     marginBottom: 2,
-  }
+  },
+  pointerAnchor: {
+    color: 'red',
+  },
 };
 
 
@@ -72,5 +75,17 @@ export class RString extends RPrimitive {
 export class RSymbol extends RPrimitive {
   renderData() {
     return this.props.data;
+  }
+}
+
+// only renders the start anchor of the pointer, and then jsPlumb needs
+// to take care of actually drawing the pointer
+// this.props.data contains unique CSS IDs of pointer's start and end anchors
+export class RPointer extends RPrimitive {
+  // TODO: add pointer properties here such as width, arrows, style, label
+  renderData() {
+    // divs with a space in it make good jsPlumb endpoints;
+    // space is necessary for older versions of IE to anchor, I think
+    return <div id={this.props.data.src} style={myStyle.pointerAnchor}>x</div>;
   }
 }

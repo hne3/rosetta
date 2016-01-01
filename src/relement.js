@@ -7,16 +7,13 @@ var myStyle = {
     fontFamily: 'verdana, arial, helvetica, sans-serif',
   },
   indexTd: {
-    /*
-    paddingLeft: 4,
-    paddingTop: 2,
-    paddingBottom: 3,
-    */
     fontSize: '8pt',
     color: '#777',
   },
-  keyTd: {},
-  valueTd: {},
+  keyTd: {
+  },
+  valueTd: {
+  },
   addrTd: {
     fontSize: '8pt',
     color: '#777',

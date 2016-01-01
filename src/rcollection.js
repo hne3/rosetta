@@ -17,11 +17,43 @@ var myStyle = {
     color: '#555',
     marginBottom: 2,
   },
-  collectionTable: {},
-  indexTd: {},
-  keyTd: {},
-  valueTd: {},
-  addrTd: {},
+  collectionTable: {
+    borderSpacing: 0, // so that cell borders don't have a gap
+  },
+  indexTd: {
+    paddingLeft: 4,
+    paddingTop: 2,
+    paddingBottom: 3,
+    fontSize: '8pt',
+    color: '#777',
+    borderLeft: '1px solid #555555', // for lists
+  },
+  keyTd: {
+    paddingTop: 0,
+    paddingBottom: 8,
+    paddingLeft: 10,
+    paddingRight: 10,
+    verticalAlign: 'bottom',
+    borderBottom: '1px solid #555555', // for lists
+    borderLeft: '1px solid #555555',
+  },
+  valueTd: {
+    paddingTop: 0,
+    paddingBottom: 8,
+    paddingLeft: 10,
+    paddingRight: 10,
+    verticalAlign: 'bottom',
+    borderBottom: '1px solid #555555', // for lists
+    borderLeft: '1px solid #555555',
+  },
+  addrTd: {
+    paddingLeft: 4,
+    paddingTop: 2,
+    paddingBottom: 3,
+    fontSize: '8pt',
+    color: '#777',
+    borderLeft: '1px solid #555555', // for lists
+  },
   gridCellTd: {},
 };
 

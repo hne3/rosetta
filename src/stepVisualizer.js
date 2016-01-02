@@ -34,14 +34,12 @@ var connectorHighlightColor = brightRed;
 var connectorInactiveColor = '#cccccc';
 
 
-// TODO: look into using multiple jsPlumb instances to manage complexity
-// https://jsplumbtoolkit.com/community/doc/home.html#multiple
-
 // TODO: use React component lifecycle methods to re-render jsPlumb after each
 // state change: https://facebook.github.io/react/docs/component-specs.html
 
-
-// TODO: add stack and heap components
+// TODO: have this class parse the execution trace at a particular
+// program point and "own" all the pointers so that it can re-render on
+// every state update
 export class StepVisualizer extends React.Component {
   // create a unique ID so that jsPlumb doesn't get confused due to
   // multiple StepVisualizer instances being displayed on the same page
@@ -89,6 +87,9 @@ export class StepVisualizer extends React.Component {
     // we can't initialize this until after the entire DOM has been
     // rendered for the first time, since we need the
     // document.getElementById call to find the root element
+    //
+    // use multiple jsPlumb instances to manage complexity
+    // https://jsplumbtoolkit.com/community/doc/home.html#multiple
     //
     // TODO: should we make this part of this.state or keep it independent?
     // maybe keep it independent since it's not related to React?

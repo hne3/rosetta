@@ -205,21 +205,6 @@ function createRosettaObject(obj) {
   }
 }
 
-// TODO: specialize for each language ...
-/* TODO:
-
-#   Compound objects:
-#   * list     - ['LIST', elt1, elt2, elt3, ..., eltN]
-#   * tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
-#   * set      - ['SET', elt1, elt2, elt3, ..., eltN]
-#   * dict     - ['DICT', [key1, value1], [key2, value2], ..., [keyN, valueN]]
-#   * instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
-#   * instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
-#   * class    - ['CLASS', class name, [list of superclass names], [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
-#   * function - ['FUNCTION', function name, parent frame ID (for nested functions)]
-#   * module   - ['module', module name]
-#   * other    - [<type name>, string representation of object]
-*/
 function createRosettaCompoundObject(obj) {
   var ret = undefined;
 
@@ -228,36 +213,47 @@ function createRosettaCompoundObject(obj) {
     console.assert(obj.length === 2);
     ret = <RPointer typeTag="ref" data={{start: '???', end: 'obj_' + obj[1]}} />;
   } else if (obj[0] === 'LIST') {
-    console.log(_.rest(obj));
+    // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
     ret = <RCollection layout="HorizontalLayout"
             name="list"
-            elts={_.rest(obj).map((c, i) => createRosettaObject(c))} />
+            elts={_.rest(obj).map((c, i) => createRosettaObject(c))} />;
   } else if (obj[0] === 'TUPLE') {
-    // ret =
+    // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
+    ret = <RCollection layout="HorizontalLayout"
+            name="tuple"
+            elts={_.rest(obj).map((c, i) => createRosettaObject(c))} />;
   } else if (obj[0] === 'SET') {
-    // ret =
+    // set      - ['SET', elt1, elt2, elt3, ..., eltN]
+    // TODO: heuristically compute ncols based on size of set
   } else if (obj[0] === 'DICT') {
+    // dict     - ['DICT', [key1, value1], [key2, value2], ..., [keyN, valueN]]
     // ret =
   } else if (obj[0] === 'INSTANCE') {
+    // instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
     // ret =
   } else if (obj[0] === 'INSTANCE_PPRINT') {
+    // instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
     // ret =
   } else if (obj[0] === 'CLASS') {
+    // class    - ['CLASS', class name, [list of superclass names], [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
     // ret =
   } else if (obj[0] === 'FUNCTION') {
+    // function - ['FUNCTION', function name, parent frame ID (for nested functions)]
+    // TODO: support parent frame ID
     console.assert(obj.length === 3);
-    // ret =
-    // ret = 
+    ret = <RSymbol typeTag="function" data={obj[1]} />;
   } else if (obj[0] === 'module') {
-    // ret =
+    // module   - ['module', module name]
+    console.assert(obj.length === 2);
+    ret = <RSymbol typeTag="module" data={obj[1]} />;
   } else {
+    // other    - [<type name>, string representation of object]
     console.assert(obj.length === 2);
     var typeName = obj[0];
     var stringRepr = obj[1];
-    // ret =
+    ret = <RSymbol typeTag={obj[0]} data={obj[1]} />;
   }
 
-  console.log('RET:', ret, obj);
   console.assert(ret);
   return ret;
 }

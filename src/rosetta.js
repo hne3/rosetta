@@ -17,7 +17,7 @@ import 'd3';
 import {RNumber, RString, RSymbol, RPointer} from 'rprimitive';
 import {RElement} from 'relement';
 import {RCollection} from 'rcollection';
-import {StepVisualizer} from 'stepVisualizer';
+import {StackFrame, StepVisualizer} from 'stepVisualizer';
 
 
 var f = <RNumber typeTag="float"
@@ -38,11 +38,11 @@ var p2 = <RPointer typeTag="ptr" data={{start: 'foo2Id', end: 'bar2Id'}} />;
 
 var sym = <RSymbol data={"globalX"} />;
 
-ReactDOM.render(f, document.getElementById("primitiveDiv1"));
-ReactDOM.render(s, document.getElementById("primitiveDiv2"));
-ReactDOM.render(b, document.getElementById("primitiveDiv3"));
-ReactDOM.render(i, document.getElementById("primitiveDiv4"));
-ReactDOM.render(sym, document.getElementById("primitiveDiv5"));
+//ReactDOM.render(f, document.getElementById("primitiveDiv1"));
+//ReactDOM.render(s, document.getElementById("primitiveDiv2"));
+//ReactDOM.render(b, document.getElementById("primitiveDiv3"));
+//ReactDOM.render(i, document.getElementById("primitiveDiv4"));
+//ReactDOM.render(sym, document.getElementById("primitiveDiv5"));
 
 
 var e1 = <RElement isVertical={true} key="e1" k={s} v={f} />;
@@ -61,27 +61,55 @@ var e5 = <RElement isVertical={false} key="e5"
 
 var e6 = <RElement isVertical={true} key="e6" k={sym} v={i} />;
 
-ReactDOM.render(e1, document.getElementById("elementDiv1"));
-ReactDOM.render(e2, document.getElementById("elementDiv2"));
-ReactDOM.render(e3, document.getElementById("elementDiv3"));
-ReactDOM.render(e4, document.getElementById("elementDiv4"));
-ReactDOM.render(e5, document.getElementById("elementDiv5"));
-ReactDOM.render(e6, document.getElementById("elementDiv6"));
+//ReactDOM.render(e1, document.getElementById("elementDiv1"));
+//ReactDOM.render(e2, document.getElementById("elementDiv2"));
+//ReactDOM.render(e3, document.getElementById("elementDiv3"));
+//ReactDOM.render(e4, document.getElementById("elementDiv4"));
+//ReactDOM.render(e5, document.getElementById("elementDiv5"));
+//ReactDOM.render(e6, document.getElementById("elementDiv6"));
 
-ReactDOM.render(
-  <RCollection layout="HorizontalLayout" name="array" elts={[e1, e3, e6]} />,
-  document.getElementById("collectionDiv1"));
+var c1 = <RCollection layout="HorizontalLayout" name="array" elts={[e1, e3, e6]} />;
+var c2 = <RCollection layout="VerticalLayout" name="dict" elts={[e2, e4, e5]} />;
+var c3 = <RCollection layout="GridLayout" name="set" ncols={3} elts={[e1, e2, e3, e4, e5]} />;
 
-ReactDOM.render(
-  <RCollection layout="VerticalLayout" name="dict" elts={[e2, e4, e5]} />,
-  document.getElementById("collectionDiv2"));
+//ReactDOM.render(c1, document.getElementById("collectionDiv1"));
+//ReactDOM.render(c2, document.getElementById("collectionDiv2"));
+//ReactDOM.render(c3, document.getElementById("collectionDiv3"));
 
-ReactDOM.render(
-  <RCollection layout="GridLayout" name="set"
-    ncols={3}
-    elts={[e1, e2, e3, e4, e5]} />,
-  document.getElementById("collectionDiv3"));
+var frame1 = <RCollection layout="VerticalLayout" name="main" elts={
+  [
+    <RElement isVertical={false} key="e1"
+      k={<RSymbol data={"x"}/>}
+      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
+    <RElement isVertical={false} key="e2"
+      k={<RSymbol data={"y"}/>}
+      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
+    <RElement isVertical={false} key="e3"
+      k={<RSymbol data={"z"}/>}
+      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
+  ]} />;
 
-var sv = <StepVisualizer></StepVisualizer>
+var frame2 = <RCollection layout="VerticalLayout" name="foo" elts={
+  [
+    <RElement isVertical={false} key="e1"
+      k={<RSymbol data={"lst"}/>}
+      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
+  ]} />;
 
+var frame3 = <RCollection layout="VerticalLayout" name="bar" elts={
+  [
+    <RElement isVertical={false} key="e1"
+      k={<RSymbol data={"myLst"}/>}
+      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
+    <RElement isVertical={false} key="e2"
+      k={<RSymbol data={"Return value"}/>}
+      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />
+  ]} />;
+
+var sv = <StepVisualizer stackElts={[
+    <StackFrame frameId={"ffff1"} content={frame1}/>,
+    <StackFrame frameId={"ffff2"} content={frame2}/>,
+    <StackFrame frameId={"ffff3"} content={frame3}/>,
+  ]}
+  heapElts={[c1, c2, c3]}/>
 ReactDOM.render(sv, document.getElementById("stepViz"));

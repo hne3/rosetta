@@ -58,6 +58,9 @@ var myStyle = {
 };
 
 
+// TODO: since 'children' are passed in this.props.elts and not as
+// actual children nodes in JSX, does React still automatically
+// re-render them on state changes?
 export class RCollection extends React.Component {
   render() {
     if (this.props.layout === 'HorizontalLayout') {

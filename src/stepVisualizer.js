@@ -55,7 +55,6 @@ export class StepVisualizer extends React.Component {
     // Key: start CSS ID of jsPlumb-rendered pointer
     // Value: end CSS ID of jsPlumb-rendered pointer
     var connectionEndpointIDs = d3.map();
-
     this.state = {connectionEndpointIDs};
   }
 
@@ -65,10 +64,10 @@ export class StepVisualizer extends React.Component {
         <tbody>
           <tr>
             <td style={myStyle.stackTd}>
-              <Stack elts={this.props.stackElts}/>
+              <Stack data={this.props.data}/>
             </td>
             <td style={myStyle.heapTd}>
-              <Heap elts={this.props.heapElts}/>
+              <Heap data={this.props.data}/>
             </td>
           </tr>
         </tbody>
@@ -120,21 +119,39 @@ export class StepVisualizer extends React.Component {
   }
 }
 
-export class StackFrame extends React.Component {
+class GlobalFrame extends React.Component {
   render() {
-    return this.props.content;
+    console.log('GlobalFrame:', this.props.ordered_globals, this.props.globals);
+    // TODO: return a RCollection with VerticalLayout
+    return <div>Global Frame!!!</div>
+  }
+}
+
+class StackFrame extends React.Component {
+  render() {
+    console.log('StackFrame:', this.props.data);
+    // TODO: return a RCollection with VerticalLayout
+    return <div>Stack Frame!!!</div>
   }
 }
 
 class Stack extends React.Component {
   render() {
+    // first render globals, and then render each stack frame in order
     // each StackFrame should have a unique frame ID to use as the key
     return (
       <div>
         <div key={"stackLabel"}>Frames</div>
-        {this.props.elts.map((c, i) =>
-          <div key={c.props.frameId} style={myStyle.stackFrame}>{c}</div>)
-        }
+
+        <div key={"global_frame"} style={myStyle.stackFrame}>
+          <GlobalFrame globals={this.props.data.globals}
+                       ordered_globals={this.props.data.ordered_globals} />
+        </div>
+        {this.props.data.stack_to_render.map((c, i) =>
+          <div key={"stack_frame_id" + c.frame_id} style={myStyle.stackFrame}>
+            <StackFrame data={c} />
+          </div>
+        )}
       </div>
     );
   }
@@ -146,13 +163,17 @@ class Heap extends React.Component {
   //
   // TODO: make a better key for heap rows ...
   render() {
+    //console.log('Heap:', this.props.data);
     return (
+      <div>HEAP!!!</div>
+      /*
       <div>
         <div key={"heapLabel"}>Objects</div>
         {this.props.elts.map((c, i) =>
           <div key={i} style={myStyle.heapRow}>{c}</div>)
         }
       </div>
+      */
     );
   }
 }

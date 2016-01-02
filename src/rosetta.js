@@ -17,7 +17,7 @@ import 'd3';
 import {RNumber, RString, RSymbol, RPointer} from 'rprimitive';
 import {RElement} from 'relement';
 import {RCollection} from 'rcollection';
-import {StackFrame, StepVisualizer} from 'stepVisualizer';
+import {StepVisualizer} from 'stepVisualizer';
 
 
 var f = <RNumber typeTag="float"
@@ -76,41 +76,11 @@ var c3 = <RCollection layout="GridLayout" name="set" ncols={3} elts={[e1, e2, e3
 //ReactDOM.render(c2, document.getElementById("collectionDiv2"));
 //ReactDOM.render(c3, document.getElementById("collectionDiv3"));
 
-var frame1 = <RCollection layout="VerticalLayout" name="main" elts={
-  [
-    <RElement isVertical={false} key="e1"
-      k={<RSymbol data={"x"}/>}
-      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
-    <RElement isVertical={false} key="e2"
-      k={<RSymbol data={"y"}/>}
-      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
-    <RElement isVertical={false} key="e3"
-      k={<RSymbol data={"z"}/>}
-      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
-  ]} />;
 
-var frame2 = <RCollection layout="VerticalLayout" name="foo" elts={
-  [
-    <RElement isVertical={false} key="e1"
-      k={<RSymbol data={"lst"}/>}
-      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
-  ]} />;
+// generated from:
+// http://www.pythontutor.com/visualize.html#code=x+%3D+%5B1,+2,+3%5D%0Ay+%3D+%5B4,+5,+6%5D%0Az+%3D+y%0Ay+%3D+x%0Ax+%3D+z%0A%0Ax+%3D+%5B1,+2,+3%5D+%23+a+different+%5B1,+2,+3%5D+list!%0Ay+%3D+x%0Ax.append(4%29%0Ay.append(5%29%0Az+%3D+%5B1,+2,+3,+4,+5%5D+%23+a+different+list!%0Ax.append(6%29%0Ay.append(7%29%0Ay+%3D+%22hello%22%0A%0A%0Adef+foo(lst%29%3A%0A++++lst.append(%22hello%22%29%0A++++bar(lst%29%0A%0Adef+bar(myLst%29%3A%0A++++print(myLst%29%0A%0Afoo(x%29%0Afoo(z%29&mode=display&origin=opt-frontend.js&cumulative=false&heapPrimitives=false&textReferences=false&py=2&rawInputLstJSON=%5B%5D&curInstr=21
+// JSON.stringify(myVisualizer.curTrace[21])
+var step21 = {"ordered_globals":["x","y","z","foo","bar"],"stdout":"[1, 2, 3, 4, 5, 6, 7, 'hello']\n","func_name":"bar","stack_to_render":[{"frame_id":1,"encoded_locals":{"lst":["REF",3]},"is_highlighted":false,"is_parent":false,"func_name":"foo","is_zombie":false,"parent_frame_id_list":[],"unique_hash":"foo_f1","ordered_varnames":["lst"]},{"frame_id":2,"encoded_locals":{"__return__":null,"myLst":["REF",3]},"is_highlighted":true,"is_parent":false,"func_name":"bar","is_zombie":false,"parent_frame_id_list":[],"unique_hash":"bar_f2","ordered_varnames":["myLst","__return__"]}],"globals":{"y":"hello","x":["REF",3],"foo":["REF",5],"bar":["REF",6],"z":["REF",4]},"heap":{"3":["LIST",1,2,3,4,5,6,7,"hello"],"4":["LIST",1,2,3,4,5],"5":["FUNCTION","foo(lst)",null],"6":["FUNCTION","bar(myLst)",null]},"line":22,"event":"return"}
 
-var frame3 = <RCollection layout="VerticalLayout" name="bar" elts={
-  [
-    <RElement isVertical={false} key="e1"
-      k={<RSymbol data={"myLst"}/>}
-      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />,
-    <RElement isVertical={false} key="e2"
-      k={<RSymbol data={"Return value"}/>}
-      v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />
-  ]} />;
-
-var sv = <StepVisualizer visualizerID={42}
-           stackElts={[
-             <StackFrame frameId={"ffff1"} content={frame1}/>,
-             <StackFrame frameId={"ffff2"} content={frame2}/>,
-             <StackFrame frameId={"ffff3"} content={frame3}/>,
-           ]}
-           heapElts={[c1, c2, c3]}/>
+var sv = <StepVisualizer visualizerID={42} data={step21} />
 ReactDOM.render(sv, document.getElementById("stepViz"));

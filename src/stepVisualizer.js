@@ -322,6 +322,10 @@ class Heap extends React.Component {
   // TODO: define clearer nesting vs. external pointing rules
   //
   // TODO: make a better key for heap rows ...
+  // - maybe using the ID of the FIRST object in the row would be a good key,
+  //   since it wouldn't change if more objects are appended to that row?
+  //   (that way, the row would be removed if that object disappears,
+  //   which is sensible)
   render() {
     console.log('Heap:', this.props.data);
     return (

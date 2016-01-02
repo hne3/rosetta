@@ -128,9 +128,53 @@ export class StepVisualizer extends React.Component {
   }
 }
 
-function createRosettaPrimitive(elt) {
-  console.log('createRosettaPrimitive:', elt);
-  return <div>[PRIMITIVE!]</div>;
+// obj is an encoded object from the backend
+// TODO: specialize for the vocabulary and types in each programming language
+function createRosettaPrimitive(obj) {
+  var typ = typeof obj;
+  var ret;
+
+  if (obj == null) {
+    // null object
+    // TODO: different spellings for different languages ...
+    // e.g., 'null' for JS, but 'None' for Python
+    ret = <RSymbol data={"None"} />;
+  }
+  else if (typ == "number") {
+    // number object
+    ret = <RNumber typeTag="number" data={obj}
+            renderNumberFunc={(x) => d3.round(x, 0)} />
+  }
+  else if (typ == "boolean") {
+    // TODO: different spellings for different languages ...
+    // e.g., 'true' for JS, but 'True' for Python
+    ret = <RSymbol typeTag="bool" data={obj ? "True" : "False"} />;
+  }
+  else if (typ == "string") {
+    ret = <RString data={obj} />;
+  }
+  else if (typ == "object") {
+    // TODO: remove kludge and special treatment for different languages
+    // ... abstract into a language-specific layer
+    if (obj[0] == 'SPECIAL_FLOAT' || obj[0] == 'JS_SPECIAL_VAL') {
+      // special number object (???)
+      ret = <RSymbol typeTag="number" data={obj} />;
+    } else {
+      if (obj[0] == 'REF') {
+        ret = <RPointer typeTag="ref"
+          data={{start: '???', end: 'obj_' + obj[1]}} />;
+      } else {
+        // TODO: breaks on collection types
+        console.assert(false);
+      }
+    }
+  }
+  else {
+    console.assert(false);
+  }
+
+  console.assert(ret);
+  return ret;
 }
 
 // orderedVarnames is a list of variable names in order

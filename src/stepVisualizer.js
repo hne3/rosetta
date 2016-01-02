@@ -2,12 +2,18 @@
 
 import React from 'react';
 
+import {RNumber, RString, RSymbol, RPointer} from 'rprimitive';
+import {RElement} from 'relement';
+import {RCollection} from 'rcollection';
+
 // wow command-line bullshittery:
 // https://github.com/sporritt/jsPlumb/issues/399
 // reference as jsPlumb after npm installing script-loader and imports-loader
 import plumb from 'imports?this=>window!script!../node_modules/jsplumb/dist/js/jsPlumb-2.0.3-min.js';
 
 import 'd3';
+
+import _ from 'underscore';
 
 
 // use the CSS-in-JS approach:
@@ -33,6 +39,9 @@ var connectorBaseColor = '#005583';
 var connectorHighlightColor = brightRed;
 var connectorInactiveColor = '#cccccc';
 
+
+// TODO: maybe use custom events (e.g., a simple version of Flux?) to
+// pass notifications of pointer start/end nodes UP from children to parents?
 
 // TODO: use React component lifecycle methods to re-render jsPlumb after each
 // state change: https://facebook.github.io/react/docs/component-specs.html
@@ -119,19 +128,47 @@ export class StepVisualizer extends React.Component {
   }
 }
 
+function createRosettaPrimitive(elt) {
+  console.log('createRosettaPrimitive:', elt);
+  return <div>[PRIMITIVE!]</div>;
+}
+
+// orderedVarnames is a list of variable names in order
+// varsToVals is a mapping of variable names to their encoded values
+function createFrameElements(orderedVarnames, varsToVals) {
+  // iterate in order!
+  var elts = orderedVarnames.map((c, i) => {
+    console.assert(_.has(varsToVals, c));
+    return (
+      <RElement isVertical={false} key={c}
+        k={<RSymbol data={c}/>}
+        v={<RSymbol data={createRosettaPrimitive(varsToVals[c])}/>} />
+    );
+  });
+  return elts;
+}
+
 class GlobalFrame extends React.Component {
   render() {
-    console.log('GlobalFrame:', this.props.ordered_globals, this.props.globals);
-    // TODO: return a RCollection with VerticalLayout
-    return <div>Global Frame!!!</div>
+    var frameElts = createFrameElements(this.props.ordered_globals,
+                                        this.props.globals);
+    return (
+      <RCollection layout="VerticalLayout"
+        name="Global frame"
+        elts={frameElts} />
+    );
   }
 }
 
 class StackFrame extends React.Component {
   render() {
-    console.log('StackFrame:', this.props.data);
-    // TODO: return a RCollection with VerticalLayout
-    return <div>Stack Frame!!!</div>
+    var frameElts = createFrameElements(this.props.data.ordered_varnames,
+                                        this.props.data.encoded_locals);
+    return (
+      <RCollection layout="VerticalLayout"
+        name={this.props.data.func_name}
+        elts={frameElts} />
+    );
   }
 }
 

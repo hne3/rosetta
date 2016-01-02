@@ -86,6 +86,9 @@ export class RPointer extends RPrimitive {
   renderData() {
     // divs with a space in it make good jsPlumb endpoints;
     // space is necessary for older versions of IE to anchor, I think
-    return <div id={this.props.data.start} style={myStyle.pointerAnchor}>x</div>;
+    return <div id={this.props.data.start} style={myStyle.pointerAnchor}>
+    x
+    {this.props.data.end}
+    </div>;
   }
 }

@@ -12,7 +12,6 @@ import {RCollection} from 'rcollection';
 import plumb from 'imports?this=>window!script!../node_modules/jsplumb/dist/js/jsPlumb-2.0.3-min.js';
 
 import 'd3';
-
 import _ from 'underscore';
 
 
@@ -202,8 +201,11 @@ function createRosettaObject(obj) {
   if (isPrimitiveType(obj)) {
     return createRosettaPrimitive(obj);
   } else {
-    var ret;
+    return createRosettaCompoundObject(obj);
+  }
+}
 
+// TODO: specialize for each language ...
 /* TODO:
 
 #   Compound objects:
@@ -217,41 +219,47 @@ function createRosettaObject(obj) {
 #   * function - ['FUNCTION', function name, parent frame ID (for nested functions)]
 #   * module   - ['module', module name]
 #   * other    - [<type name>, string representation of object]
-#   * compound object reference - ['REF', target object's unique_id]
 */
+function createRosettaCompoundObject(obj) {
+  var ret = undefined;
 
-    console.assert(typeof obj == "object");
-    if (obj[0] === 'REF') {
-      ret = <RPointer typeTag="ref"
-        data={{start: '???', end: 'obj_' + obj[1]}} />;
-    } else if (obj[0] === 'LIST') {
-      // ret =
-    } else if (obj[0] === 'TUPLE') {
-      // ret =
-    } else if (obj[0] === 'SET') {
-      // ret =
-    } else if (obj[0] === 'DICT') {
-      // ret =
-    } else if (obj[0] === 'INSTANCE') {
-      // ret =
-    } else if (obj[0] === 'INSTANCE_PPRINT') {
-      // ret =
-    } else if (obj[0] === 'CLASS') {
-      // ret =
-    } else if (obj[0] === 'FUNCTION') {
-      // ret =
-    } else if (obj[0] === 'module') {
-      // ret =
-    } else {
-      console.assert(obj.length === 2);
-      var typeName = obj[0];
-      var stringRepr = obj[1];
-      // ret =
-    }
-
-    console.assert(ret);
-    return ret;
+  console.assert(typeof obj == "object");
+  if (obj[0] === 'REF') {
+    console.assert(obj.length === 2);
+    ret = <RPointer typeTag="ref" data={{start: '???', end: 'obj_' + obj[1]}} />;
+  } else if (obj[0] === 'LIST') {
+    console.log(_.rest(obj));
+    ret = <RCollection layout="HorizontalLayout"
+            name="list"
+            elts={_.rest(obj).map((c, i) => createRosettaObject(c))} />
+  } else if (obj[0] === 'TUPLE') {
+    // ret =
+  } else if (obj[0] === 'SET') {
+    // ret =
+  } else if (obj[0] === 'DICT') {
+    // ret =
+  } else if (obj[0] === 'INSTANCE') {
+    // ret =
+  } else if (obj[0] === 'INSTANCE_PPRINT') {
+    // ret =
+  } else if (obj[0] === 'CLASS') {
+    // ret =
+  } else if (obj[0] === 'FUNCTION') {
+    console.assert(obj.length === 3);
+    // ret =
+    // ret = 
+  } else if (obj[0] === 'module') {
+    // ret =
+  } else {
+    console.assert(obj.length === 2);
+    var typeName = obj[0];
+    var stringRepr = obj[1];
+    // ret =
   }
+
+  console.log('RET:', ret, obj);
+  console.assert(ret);
+  return ret;
 }
 
 // orderedVarnames is a list of variable names in order
@@ -332,7 +340,7 @@ class Heap extends React.Component {
       <div>
         <div key={"heapLabel"}>Objects</div>
         {_.keys(this.props.data).map((c, i) =>
-          <div key={i} style={myStyle.heapRow}>{'obj_' + c}</div>)
+          <div key={i} style={myStyle.heapRow}>{createRosettaObject(this.props.data[c])}</div>)
         }
       </div>
     );

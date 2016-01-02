@@ -76,7 +76,7 @@ export class StepVisualizer extends React.Component {
               <Stack data={this.props.data}/>
             </td>
             <td style={myStyle.heapTd}>
-              <Heap data={this.props.data}/>
+              <Heap data={this.props.data.heap}/>
             </td>
           </tr>
         </tbody>
@@ -128,46 +128,66 @@ export class StepVisualizer extends React.Component {
   }
 }
 
+
+function isPrimitiveType(obj) {
+  // TODO: specialize for different languages; see this line in
+  // pytutor.js ...
+  // var hook_result = this.try_hook("isPrimitiveType", {obj:obj});
+
+  // null is a primitive
+  if (obj === null) {
+    return true;
+  }
+
+  if (typeof obj == "object") {
+    // kludge: only 'SPECIAL_FLOAT' objects count as primitives
+    // TODO: eliminate this kludge with language-specific rules
+    return (obj[0] == 'SPECIAL_FLOAT' || obj[0] == 'JS_SPECIAL_VAL');
+  }
+  else {
+    // non-objects are primitives
+    return true;
+  }
+}
+
+function getRefID(obj) {
+  console.assert(obj[0] === 'REF');
+  return obj[1];
+}
+
+
 // obj is an encoded object from the backend
 // TODO: specialize for the vocabulary and types in each programming language
 function createRosettaPrimitive(obj) {
   var typ = typeof obj;
   var ret;
 
-  if (obj == null) {
+  if (obj == null) { // use == instead of === to be more lenient here
     // null object
     // TODO: different spellings for different languages ...
     // e.g., 'null' for JS, but 'None' for Python
     ret = <RSymbol data={"None"} />;
   }
-  else if (typ == "number") {
+  else if (typ === "number") {
     // number object
     ret = <RNumber typeTag="number" data={obj}
             renderNumberFunc={(x) => d3.round(x, 0)} />
   }
-  else if (typ == "boolean") {
+  else if (typ === "boolean") {
     // TODO: different spellings for different languages ...
     // e.g., 'true' for JS, but 'True' for Python
     ret = <RSymbol typeTag="bool" data={obj ? "True" : "False"} />;
   }
-  else if (typ == "string") {
+  else if (typ === "string") {
     ret = <RString data={obj} />;
   }
-  else if (typ == "object") {
+  else if (typ === "object") {
     // TODO: remove kludge and special treatment for different languages
     // ... abstract into a language-specific layer
-    if (obj[0] == 'SPECIAL_FLOAT' || obj[0] == 'JS_SPECIAL_VAL') {
-      // special number object (???)
-      ret = <RSymbol typeTag="number" data={obj} />;
-    } else {
-      if (obj[0] == 'REF') {
-        ret = <RPointer typeTag="ref"
-          data={{start: '???', end: 'obj_' + obj[1]}} />;
-      } else {
-        // TODO: breaks on collection types
-        console.assert(false);
-      }
-    }
+    console.assert(obj[0] === 'SPECIAL_FLOAT' || obj[0] === 'JS_SPECIAL_VAL');
+    console.assert(obj.length === 2);
+    // special number object (???)
+    ret = <RSymbol typeTag="number" data={obj[1]} />;
   }
   else {
     console.assert(false);
@@ -175,6 +195,63 @@ function createRosettaPrimitive(obj) {
 
   console.assert(ret);
   return ret;
+}
+
+// TODO: specialize for each language ...
+function createRosettaObject(obj) {
+  if (isPrimitiveType(obj)) {
+    return createRosettaPrimitive(obj);
+  } else {
+    var ret;
+
+/* TODO:
+
+#   Compound objects:
+#   * list     - ['LIST', elt1, elt2, elt3, ..., eltN]
+#   * tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
+#   * set      - ['SET', elt1, elt2, elt3, ..., eltN]
+#   * dict     - ['DICT', [key1, value1], [key2, value2], ..., [keyN, valueN]]
+#   * instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
+#   * instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
+#   * class    - ['CLASS', class name, [list of superclass names], [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
+#   * function - ['FUNCTION', function name, parent frame ID (for nested functions)]
+#   * module   - ['module', module name]
+#   * other    - [<type name>, string representation of object]
+#   * compound object reference - ['REF', target object's unique_id]
+*/
+
+    console.assert(typeof obj == "object");
+    if (obj[0] === 'REF') {
+      ret = <RPointer typeTag="ref"
+        data={{start: '???', end: 'obj_' + obj[1]}} />;
+    } else if (obj[0] === 'LIST') {
+      // ret =
+    } else if (obj[0] === 'TUPLE') {
+      // ret =
+    } else if (obj[0] === 'SET') {
+      // ret =
+    } else if (obj[0] === 'DICT') {
+      // ret =
+    } else if (obj[0] === 'INSTANCE') {
+      // ret =
+    } else if (obj[0] === 'INSTANCE_PPRINT') {
+      // ret =
+    } else if (obj[0] === 'CLASS') {
+      // ret =
+    } else if (obj[0] === 'FUNCTION') {
+      // ret =
+    } else if (obj[0] === 'module') {
+      // ret =
+    } else {
+      console.assert(obj.length === 2);
+      var typeName = obj[0];
+      var stringRepr = obj[1];
+      // ret =
+    }
+
+    console.assert(ret);
+    return ret;
+  }
 }
 
 // orderedVarnames is a list of variable names in order
@@ -186,7 +263,7 @@ function createFrameElements(orderedVarnames, varsToVals) {
     return (
       <RElement isVertical={false} key={c}
         k={<RSymbol data={c}/>}
-        v={<RSymbol data={createRosettaPrimitive(varsToVals[c])}/>} />
+        v={<RSymbol data={createRosettaObject(varsToVals[c])}/>} />
     );
   });
   return elts;
@@ -240,21 +317,20 @@ class Stack extends React.Component {
 
 class Heap extends React.Component {
   // just do a super-simple div-based vertical stacking layout for now; expand
-  // to a 2-D layout later ...
+  // to a more sophisticated 2-D layout later ...
+  //
+  // TODO: define clearer nesting vs. external pointing rules
   //
   // TODO: make a better key for heap rows ...
   render() {
-    //console.log('Heap:', this.props.data);
+    console.log('Heap:', this.props.data);
     return (
-      <div>HEAP!!!</div>
-      /*
       <div>
         <div key={"heapLabel"}>Objects</div>
-        {this.props.elts.map((c, i) =>
-          <div key={i} style={myStyle.heapRow}>{c}</div>)
+        {_.keys(this.props.data).map((c, i) =>
+          <div key={i} style={myStyle.heapRow}>{'obj_' + c}</div>)
         }
       </div>
-      */
     );
   }
 }

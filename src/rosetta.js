@@ -106,10 +106,11 @@ var frame3 = <RCollection layout="VerticalLayout" name="bar" elts={
       v={<RPointer data={{start: 'fooId', end: 'barId'}} />} />
   ]} />;
 
-var sv = <StepVisualizer stackElts={[
-    <StackFrame frameId={"ffff1"} content={frame1}/>,
-    <StackFrame frameId={"ffff2"} content={frame2}/>,
-    <StackFrame frameId={"ffff3"} content={frame3}/>,
-  ]}
-  heapElts={[c1, c2, c3]}/>
+var sv = <StepVisualizer visualizerID={42}
+           stackElts={[
+             <StackFrame frameId={"ffff1"} content={frame1}/>,
+             <StackFrame frameId={"ffff2"} content={frame2}/>,
+             <StackFrame frameId={"ffff3"} content={frame3}/>,
+           ]}
+           heapElts={[c1, c2, c3]}/>
 ReactDOM.render(sv, document.getElementById("stepViz"));

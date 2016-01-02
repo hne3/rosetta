@@ -7,6 +7,8 @@ import React from 'react';
 // reference as jsPlumb after npm installing script-loader and imports-loader
 import plumb from 'imports?this=>window!script!../node_modules/jsplumb/dist/js/jsPlumb-2.0.3-min.js';
 
+import 'd3';
+
 
 // use the CSS-in-JS approach:
 // http://blog.vjeux.com/2014/javascript/react-css-in-js-nationjs.html
@@ -26,6 +28,11 @@ var myStyle = {
   },
 }
 
+var brightRed = '#e93f34';
+var connectorBaseColor = '#005583';
+var connectorHighlightColor = brightRed;
+var connectorInactiveColor = '#cccccc';
+
 
 // TODO: look into using multiple jsPlumb instances to manage complexity
 // https://jsplumbtoolkit.com/community/doc/home.html#multiple
@@ -36,9 +43,24 @@ var myStyle = {
 
 // TODO: add stack and heap components
 export class StepVisualizer extends React.Component {
+  getID() {
+    console.assert(this.props.visualizerID);
+    return 'stepVisualizer' + this.props.visualizerID;
+  }
+
+  constructor(props) {
+    super(props);
+
+    // Key: start CSS ID of jsPlumb-rendered pointer
+    // Value: end CSS ID of jsPlumb-rendered pointer
+    var connectionEndpointIDs = d3.map();
+
+    this.state = {connectionEndpointIDs};
+  }
+
   render() {
     return (
-      <table>
+      <table id={this.getID()}>
         <tbody>
           <tr>
             <td style={myStyle.stackTd}>
@@ -51,6 +73,46 @@ export class StepVisualizer extends React.Component {
         </tbody>
       </table>
     );
+  }
+
+  // "Invoked once, only on the client (not on the server), immediately
+  // after the initial rendering occurs. At this point in the lifecycle,
+  // you can access any refs to your children (e.g., to access the
+  // underlying DOM representation). The componentDidMount() method of
+  // child components is invoked before that of parent components."
+  componentDidMount() {
+    console.log("componentDidMount");
+
+    // we can't initialize this until after the entire DOM has been
+    // rendered for the first time, since we need
+    // document.getElementById to find the element with ID this.getID()
+    //
+    // TODO: should we make this part of this.state or keep it independent?
+    // maybe keep it independent since it's not related to React?
+    this.jsPlumbInstance = jsPlumb.getInstance({
+      Endpoint: ["Dot", {radius:3}],
+      EndpointStyles: [{fillStyle: connectorBaseColor}, {fillstyle: null} /* make right endpoint invisible */],
+      Anchors: ["RightMiddle", "LeftMiddle"],
+      PaintStyle: {lineWidth:1, strokeStyle: connectorBaseColor},
+
+      // state machine curve style:
+      Connector: [ "StateMachine" ],
+      Overlays: [[ "Arrow", { length: 10, width:7, foldback:0.55, location:1 }]],
+      EndpointHoverStyles: [{fillStyle: connectorHighlightColor}, {fillstyle: null} /* make right endpoint invisible */],
+      HoverPaintStyle: {lineWidth: 1, strokeStyle: connectorHighlightColor},
+
+      // very important to set a custom Container here after the DOM has
+      // been rendered, so that this node already exists ...
+      Container: document.getElementById(this.getID()),
+    });
+  }
+
+  // "Invoked immediately after the component's updates are flushed to
+  // the DOM. This method is not called for the initial render. Use this as
+  // an opportunity to operate on the DOM when the component has been
+  // updated."
+  componentDidUpdate() {
+    console.log("componentDidUpdate");
   }
 }
 

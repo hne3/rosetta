@@ -43,9 +43,12 @@ var connectorInactiveColor = '#cccccc';
 
 // TODO: add stack and heap components
 export class StepVisualizer extends React.Component {
-  getID() {
+  // create a unique ID so that jsPlumb doesn't get confused due to
+  // multiple StepVisualizer instances being displayed on the same page
+  generateID(originalID) {
     console.assert(this.props.visualizerID);
-    return 'stepVisualizer' + this.props.visualizerID;
+    // (it's safer to start names with a letter rather than a number)
+    return 'v' + this.props.visualizerID + '__' + originalID;
   }
 
   constructor(props) {
@@ -60,7 +63,7 @@ export class StepVisualizer extends React.Component {
 
   render() {
     return (
-      <table id={this.getID()}>
+      <table id={this.generateID('root')}>
         <tbody>
           <tr>
             <td style={myStyle.stackTd}>
@@ -84,8 +87,8 @@ export class StepVisualizer extends React.Component {
     console.log("componentDidMount");
 
     // we can't initialize this until after the entire DOM has been
-    // rendered for the first time, since we need
-    // document.getElementById to find the element with ID this.getID()
+    // rendered for the first time, since we need the
+    // document.getElementById call to find the root element
     //
     // TODO: should we make this part of this.state or keep it independent?
     // maybe keep it independent since it's not related to React?
@@ -103,7 +106,7 @@ export class StepVisualizer extends React.Component {
 
       // very important to set a custom Container here after the DOM has
       // been rendered, so that this node already exists ...
-      Container: document.getElementById(this.getID()),
+      Container: document.getElementById(this.generateID('root')),
     });
   }
 

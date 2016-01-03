@@ -232,10 +232,10 @@ function createRosettaCompoundObject(obj, memAddr) {
     // ret =
     // TODO: how about creating a RMemBlock with isVertical = false?
   } else if (obj[0] === 'INSTANCE') {
-    // instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
+    // instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
     // ret =
   } else if (obj[0] === 'INSTANCE_PPRINT') {
-    // instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
+    // instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
     // ret =
   } else if (obj[0] === 'CLASS') {
     // class    - ['CLASS', class name, [list of superclass names], [attr1, value1], [attr2, value2], ..., [attrN, valueN]]

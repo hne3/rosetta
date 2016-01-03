@@ -170,7 +170,7 @@ function createRosettaPrimitive(obj) {
   else if (typ === "number") {
     // number object
     ret = <RNumber typeTag="number" data={obj}
-            renderNumberFunc={(x) => d3.round(x, 0)} />
+            renderNumberFunc={(x) => d3.round(x, 4)} />
   }
   else if (typ === "boolean") {
     // TODO: different spellings for different languages ...
@@ -178,7 +178,7 @@ function createRosettaPrimitive(obj) {
     ret = <RSymbol typeTag="bool" data={obj ? "True" : "False"} />;
   }
   else if (typ === "string") {
-    ret = <RString data={obj} />;
+    ret = <RString typeTag="str" data={obj} />;
   }
   else if (typ === "object") {
     // TODO: remove kludge and special treatment for different languages
@@ -196,6 +196,24 @@ function createRosettaPrimitive(obj) {
   return ret;
 }
 
+// emulates Java's hashCode method
+// from http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+// capture an object's identity by stringifying it and then taking its hashCode
+function jsonHash(obj) {
+  return JSON.stringify(obj).hashCode();
+}
+
 // returns an instance of RPrimitive or RCollection
 function createRosettaCompoundObject(obj, memAddr) {
   var ret = undefined;
@@ -206,31 +224,54 @@ function createRosettaCompoundObject(obj, memAddr) {
     ret = <RPointer
             typeTag="ref"
             data={{start: '??? ' + memAddr,
-                   end:   'obj_' + getRefID(obj)}} />;
-  } else if (obj[0] === 'LIST') {
+                   end:   'heap_obj_' + getRefID(obj)}} />;
+  } else if (obj[0] === 'LIST' || obj[0] === 'TUPLE') {
     // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
-    // use the list index as the faux memory address
-    ret = <RCollection layout="HorizontalLayout"
-            name="list"
-            elts={_.rest(obj).map((c, i) =>
-              createRMemBlock(c, memAddr + '_e' + i))} />;
-  } else if (obj[0] === 'TUPLE') {
     // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
-    // use the tuple index as the faux memory address
+    // use the index as the faux memory address
     ret = <RCollection layout="HorizontalLayout"
-            name="tuple"
+            name={obj[0] === 'LIST' ? "list" : "tuple"}
             elts={_.rest(obj).map((c, i) =>
-              createRMemBlock(c, memAddr + '_e' + i))} />;
+              createRMemBlock(c, memAddr + '_e' + i, i))} />;
   } else if (obj[0] === 'SET') {
     // set      - ['SET', elt1, elt2, elt3, ..., eltN]
-    // TODO: heuristically compute ncols based on size of set
 
-    // TODO: what should we use as memAddr for each element?
-    // maybe memAddr + '_hash_' + JSON.stringify(obj) for key since sets have unique keys
+    // heuristically compute ncols based on size of set
+    // create an R x C matrix:
+    var numElts = obj.length - 1;
+    // gives roughly a 3x5 rectangular ratio, square is too, err,
+    // 'square' and boring
+    var numRows = Math.round(Math.sqrt(numElts));
+    if (numRows > 3) {
+      numRows -= 1;
+    }
+    var numCols = Math.round(numElts / numRows);
+    // round up if not a perfect multiple:
+    if (numElts % numRows) {
+      numCols += 1;
+    }
+
+    // use jsonHash() as the memory address to capture the identity of
+    // the element for React (since numerical indices are meaningless for sets)
+    ret = <RCollection layout="GridLayout"
+            name="set"
+            ncols={numCols}
+            elts={_.rest(obj).map((c, i) =>
+              createRMemBlock(c, memAddr + '_e' + jsonHash(c)))} />;
   } else if (obj[0] === 'DICT') {
     // dict     - ['DICT', [key1, value1], [key2, value2], ..., [keyN, valueN]]
-    // ret =
-    // TODO: how about creating a RMemBlock with isVertical = false?
+
+    // use jsonHash() as the memory address to capture the identity of
+    // the element for React (since numerical indices are meaningless for dicts)
+    ret = <RCollection layout="VerticalLayout"
+            name={"dict"}
+            elts={_.rest(obj).map((c, i) =>
+              createKeyValueRMemBlock(
+                c[0],
+                c[1],
+                memAddr + '_e' + jsonHash(c[0]),
+                memAddr + '_e' + jsonHash(c[1]))
+            )} />;
   } else if (obj[0] === 'INSTANCE') {
     // instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
     // ret =
@@ -250,6 +291,7 @@ function createRosettaCompoundObject(obj, memAddr) {
     console.assert(obj.length === 2);
     ret = <RSymbol typeTag="module" data={obj[1]} />;
   } else {
+    // catch-all case; put at the very end
     // other    - [<type name>, string representation of object]
     console.assert(obj.length === 2);
     ret = <RSymbol typeTag={obj[0]} data={obj[1]} />;
@@ -261,8 +303,8 @@ function createRosettaCompoundObject(obj, memAddr) {
 
 // TODO: specialize for each language ...
 // returns a RMemBlock that wraps obj, located at memAddr
-function createRMemBlock(obj, memAddr, isVertical=true) {
-  console.assert(memAddr); // should have a valid address!
+function createRMemBlock(obj, memAddr, index=null, isVertical=true) {
+  console.assert(memAddr); // every block should have a valid address!
 
   var ret = isPrimitiveType(obj) ?
     createRosettaPrimitive(obj) :
@@ -273,6 +315,32 @@ function createRMemBlock(obj, memAddr, isVertical=true) {
   return (
     <RMemBlock v={ret}
       key={memAddr} valueMemAddr={memAddr}
+      index={index}
+      isVertical={isVertical} />
+  );
+}
+
+function createKeyValueRMemBlock(key, value,
+                                 keyMemAddr, valueMemAddr,
+                                 isVertical=false) {
+  console.assert(keyMemAddr);
+  console.assert(valueMemAddr);
+
+  var keyObj = isPrimitiveType(key) ?
+    createRosettaPrimitive(key) :
+    createRosettaCompoundObject(key, keyMemAddr);
+
+  var valueObj = isPrimitiveType(value) ?
+    createRosettaPrimitive(value) :
+    createRosettaCompoundObject(value, valueMemAddr);
+
+  // NB: key and keyMemAddr seem redundant but they're both necessary
+  // since 'key' isn't part of this.props; it's for React internals
+  return (
+    <RMemBlock k={keyObj} v={valueObj}
+      key={keyMemAddr}
+      keyMemAddr={keyMemAddr}
+      valueMemAddr={valueMemAddr}
       isVertical={isVertical} />
   );
 }

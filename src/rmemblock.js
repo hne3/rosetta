@@ -31,7 +31,7 @@ export class RMemBlock extends React.Component {
       return (
         <table style={myStyle.rmemblock}>
           <tbody>
-            <tr><td style={myStyle.indexTd}>{this.props.idx}</td></tr>
+            <tr><td style={myStyle.indexTd}>{this.props.index}</td></tr>
             <tr><td style={myStyle.keyTd}>{this.props.k}</td></tr>
             <tr><td style={myStyle.valueTd}>{this.props.v}</td></tr>
             <tr><td style={myStyle.addrTd}>{this.props.valueMemAddr}</td></tr>
@@ -43,7 +43,7 @@ export class RMemBlock extends React.Component {
         <table style={myStyle.rmemblock}>
           <tbody>
             <tr>
-              <td style={myStyle.indexTd}>{this.props.idx}</td>
+              <td style={myStyle.indexTd}>{this.props.index}</td>
               <td style={myStyle.keyTd}>{this.props.k}</td>
               <td style={myStyle.valueTd}>{this.props.v}</td>
               <td style={myStyle.addrTd}>{this.props.valueMemAddr}</td>
@@ -56,7 +56,6 @@ export class RMemBlock extends React.Component {
 }
 
 RMemBlock.defaultProps = {
-  index: 'idx',
   keyMemAddr: '0xKEY_ADDR',
   valueMemAddr: '0xVAL_ADDR',
   isVertical: true,

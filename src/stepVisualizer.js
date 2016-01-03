@@ -155,9 +155,8 @@ function getRefID(obj) {
 }
 
 
-// obj is an encoded object from the backend
 // TODO: specialize for the vocabulary and types in each programming language
-// returns an instance of RPrimitive (or one of its subclasses)
+// returns an instance of RPrimitive
 function createRosettaPrimitive(obj) {
   var typ = typeof obj;
   var ret;
@@ -197,6 +196,7 @@ function createRosettaPrimitive(obj) {
   return ret;
 }
 
+// returns an instance of RPrimitive or RCollection
 function createRosettaCompoundObject(obj, memAddr) {
   var ret = undefined;
 
@@ -205,24 +205,28 @@ function createRosettaCompoundObject(obj, memAddr) {
     console.assert(obj.length === 2);
     ret = <RPointer
             typeTag="ref"
-            data={{start: '??? ' + memAddr, end: 'obj_' + obj[1]}} />;
+            data={{start: '??? ' + memAddr,
+                   end:   'obj_' + getRefID(obj)}} />;
   } else if (obj[0] === 'LIST') {
     // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
     // use the list index as the faux memory address
     ret = <RCollection layout="HorizontalLayout"
             name="list"
             elts={_.rest(obj).map((c, i) =>
-              createRMemBlock(c, String(memAddr) + '_e' + String(i)))} />;
+              createRMemBlock(c, memAddr + '_e' + i))} />;
   } else if (obj[0] === 'TUPLE') {
     // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
     // use the tuple index as the faux memory address
     ret = <RCollection layout="HorizontalLayout"
             name="tuple"
             elts={_.rest(obj).map((c, i) =>
-              createRMemBlock(c, String(memAddr) + '_e' + String(i)))} />;
+              createRMemBlock(c, memAddr + '_e' + i))} />;
   } else if (obj[0] === 'SET') {
     // set      - ['SET', elt1, elt2, elt3, ..., eltN]
     // TODO: heuristically compute ncols based on size of set
+
+    // TODO: what should we use as memAddr for each element?
+    // maybe memAddr + '_hash_' + JSON.stringify(obj) for key since sets have unique keys
   } else if (obj[0] === 'DICT') {
     // dict     - ['DICT', [key1, value1], [key2, value2], ..., [keyN, valueN]]
     // ret =
@@ -259,11 +263,10 @@ function createRosettaCompoundObject(obj, memAddr) {
 // returns a RMemBlock that wraps obj, located at memAddr
 function createRMemBlock(obj, memAddr, isVertical=true) {
   console.assert(memAddr); // should have a valid address!
-  if (isPrimitiveType(obj)) {
-    var ret = createRosettaPrimitive(obj);
-  } else {
-    var ret = createRosettaCompoundObject(obj, memAddr);
-  }
+
+  var ret = isPrimitiveType(obj) ?
+    createRosettaPrimitive(obj) :
+    createRosettaCompoundObject(obj, memAddr);
 
   // NB: key and valueMemAddr seem redundant but they're both necessary
   // since 'key' isn't part of this.props; it's for React internals

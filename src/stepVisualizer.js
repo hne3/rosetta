@@ -197,23 +197,6 @@ function createRosettaPrimitive(obj) {
   return ret;
 }
 
-// TODO: specialize for each language ...
-// returns a RMemBlock that wraps obj, located at memAddr
-function createRMemBlock(obj, memAddr) {
-  console.assert(memAddr); // should have a valid address!
-  if (isPrimitiveType(obj)) {
-    var prim = createRosettaPrimitive(obj);
-    // NB: key and valueMemAddr seem redundant but they're both necessary
-    // since 'key' isn't part of this.props; it's for React internals
-    return (
-      <RMemBlock isVertical={true} v={prim} key={memAddr} valueMemAddr={memAddr} />
-    );
-  } else {
-    return createRosettaCompoundObject(obj, memAddr);
-  }
-}
-
-// returns a RMemBlock
 function createRosettaCompoundObject(obj, memAddr) {
   var ret = undefined;
 
@@ -269,11 +252,25 @@ function createRosettaCompoundObject(obj, memAddr) {
   }
 
   console.assert(ret);
-  // wrap in a RMemBlock ...
+  return ret;
+}
+
+// TODO: specialize for each language ...
+// returns a RMemBlock that wraps obj, located at memAddr
+function createRMemBlock(obj, memAddr, isVertical=true) {
+  console.assert(memAddr); // should have a valid address!
+  if (isPrimitiveType(obj)) {
+    var ret = createRosettaPrimitive(obj);
+  } else {
+    var ret = createRosettaCompoundObject(obj, memAddr);
+  }
+
   // NB: key and valueMemAddr seem redundant but they're both necessary
   // since 'key' isn't part of this.props; it's for React internals
   return (
-    <RMemBlock v={ret} key={memAddr} valueMemAddr={memAddr} />
+    <RMemBlock v={ret}
+      key={memAddr} valueMemAddr={memAddr}
+      isVertical={isVertical} />
   );
 }
 
@@ -341,8 +338,7 @@ class StackFrame extends AbstractFrame {
 
 class Stack extends React.Component {
   render() {
-    // first render globals, and then render each stack frame in order
-    // each StackFrame should have a unique frame_id to use as the key
+    // first render globals, and then render each stack frame in order.
     //
     // use frame_id as part of the unique sort key (which is for React's
     // object constancy and *not* part of the object's props!)
@@ -376,8 +372,8 @@ class Heap extends React.Component {
       <div>
         <div key={"heapLabel"}>Objects</div>
         {_.keys(this.props.data).map((heapID, i) =>
-          <div key={'heap_id_' + heapID} style={myStyle.heapRow}>
-            {createRMemBlock(this.props.data[heapID], heapID)}
+          <div key={'heap_obj_' + heapID} style={myStyle.heapRow}>
+            {createRMemBlock(this.props.data[heapID], 'heap_obj_' + heapID)}
           </div>
         )}
       </div>

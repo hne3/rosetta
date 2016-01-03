@@ -198,51 +198,38 @@ function createRosettaPrimitive(obj) {
 }
 
 // TODO: specialize for each language ...
-// returns an RCollection or RElement (a han solo element), but NEVER an
-// RPrimitive, since primitives can't exist on the heap; they must be
-// contained within something else
-function createRosettaObject(memAddr, obj, wrapPrimitive=false) {
+// returns a RMemBlock
+function createRosettaObject(obj, memAddr=null) {
   if (isPrimitiveType(obj)) {
     var prim = createRosettaPrimitive(obj);
-    return (wrapPrimitive ?
-      // wrap primitive in an RMemBlock with memAddr as the key
-      <RMemBlock isVertical={true} key={memAddr} v={prim} /> :
-      prim
+    return (
+      <RMemBlock isVertical={true} key={memAddr} v={prim} />
     );
   } else {
-    return createRosettaCompoundObject(memAddr, obj);
+    return createRosettaCompoundObject(obj, memAddr);
   }
 }
 
-// A HA!!! the solution to all this nastiness is that EVERYTHING should
-// be contained within an element, even a collection, so the heap should
-// have ONLY elements at the top level.
-
-// returns an RCollection or RElement (a han solo element), but NEVER an
-// RPrimitive, since primitives can't exist alone on the heap; they must be
-// contained within something else
-function createRosettaHeapObject(memAddr, obj) {
-  return createRosettaObject(memAddr, obj, true /* wrapPrimitive */);
-}
-
-// returns an RCollection or RElement (a han solo element), but NEVER an RPrimitive
-function createRosettaCompoundObject(memAddr, obj) {
+// returns a RMemBlock
+function createRosettaCompoundObject(obj, memAddr) {
   var ret = undefined;
 
   console.assert(typeof obj == "object");
   if (obj[0] === 'REF') {
     console.assert(obj.length === 2);
-    ret = <RPointer typeTag="ref" data={{start: '???', end: 'obj_' + obj[1]}} />;
+    ret = <RPointer typeTag="ref" data={{start: '??? ' + memAddr, end: 'obj_' + obj[1]}} />;
   } else if (obj[0] === 'LIST') {
     // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
     ret = <RCollection layout="HorizontalLayout"
             name="list"
-            elts={_.rest(obj).map((c, i) => createRosettaObject(c))} />;
+            elts={_.rest(obj).map((c, i) => createRosettaObject(c,
+              memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
   } else if (obj[0] === 'TUPLE') {
     // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
     ret = <RCollection layout="HorizontalLayout"
             name="tuple"
-            elts={_.rest(obj).map((c, i) => createRosettaObject(c))} />;
+            elts={_.rest(obj).map((c, i) => createRosettaObject(c,
+              memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
   } else if (obj[0] === 'SET') {
     // set      - ['SET', elt1, elt2, elt3, ..., eltN]
     // TODO: heuristically compute ncols based on size of set
@@ -276,7 +263,10 @@ function createRosettaCompoundObject(memAddr, obj) {
   }
 
   console.assert(ret);
-  return ret;
+  // wrap in a RMemBlock ...
+  return (
+    <RMemBlock v={ret} valueMemAddr={memAddr} />
+  );
 }
 
 // orderedVarnames is a list of variable names in order
@@ -301,8 +291,8 @@ class GlobalFrame extends React.Component {
                                         this.props.globals);
     return (
       // should be wrapped in a RMemBlock so that environment/frame
-      // pointers can point to it; TODO:
-      <RMemBlock isVertical={true} v={
+      // pointers can point to it
+      <RMemBlock v={
         <RCollection layout="VerticalLayout"
           name="Global frame"
           elts={frameElts} />
@@ -319,8 +309,8 @@ class StackFrame extends React.Component {
                                         this.props.data.encoded_locals);
     return (
       // should be wrapped in a RMemBlock so that environment/frame
-      // pointers can point to it; TODO:
-      <RMemBlock isVertical={true} v={
+      // pointers can point to it
+      <RMemBlock v={
         <RCollection layout="VerticalLayout"
           name={this.props.data.func_name}
           elts={frameElts} />
@@ -365,13 +355,12 @@ class Heap extends React.Component {
   //   (that way, the row would be removed if that object disappears,
   //   which is sensible)
   render() {
-    console.log('Heap:', this.props.data);
     return (
       <div>
         <div key={"heapLabel"}>Objects</div>
         {_.keys(this.props.data).map((c, i) =>
           <div key={i} style={myStyle.heapRow}>
-            {createRosettaHeapObject(c, this.props.data[c])}
+            {createRosettaObject(this.props.data[c], c)}
           </div>)
         }
       </div>

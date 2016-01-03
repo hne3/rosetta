@@ -59,4 +59,5 @@ RMemBlock.defaultProps = {
   index: 'idx',
   keyMemAddr: '0xKEY_ADDR',
   valueMemAddr: '0xVAL_ADDR',
+  isVertical: true,
 };

@@ -45,9 +45,6 @@ var connectorInactiveColor = '#cccccc';
 // TODO: use React component lifecycle methods to re-render jsPlumb after each
 // state change: https://facebook.github.io/react/docs/component-specs.html
 
-// TODO: have this class parse the execution trace at a particular
-// program point and "own" all the pointers so that it can re-render on
-// every state update
 export class StepVisualizer extends React.Component {
   // create a unique ID so that jsPlumb doesn't get confused due to
   // multiple StepVisualizer instances being displayed on the same page
@@ -267,25 +264,46 @@ function createRosettaCompoundObject(obj, memAddr) {
             name={"dict"}
             elts={_.rest(obj).map((c, i) =>
               createKeyValueRMemBlock(
-                c[0],
-                c[1],
-                memAddr + '_e' + jsonHash(c[0]),
-                memAddr + '_e' + jsonHash(c[1]))
+                c[0], c[1],
+                memAddr + '_e' + jsonHash(c[0]), memAddr + '_e' + jsonHash(c[1]))
             )} />;
-  } else if (obj[0] === 'INSTANCE') {
-    // instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
-    // ret =
   } else if (obj[0] === 'INSTANCE_PPRINT') {
     // instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
-    // ret =
+    console.assert(obj.length === 3);
+    ret = <RSymbol typeTag={obj[1] + " instance"} data={obj[2]} />;
+  } else if (obj[0] === 'INSTANCE') {
+    // instance - ['INSTANCE', class name, [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
+    ret = <RCollection layout="VerticalLayout"
+            name={obj[1] + " instance"}
+            elts={_.rest(obj, 2).map((c, i) =>
+              createKeyValueRMemBlock(
+                c[0], c[1],
+                memAddr + '_e' + jsonHash(c[0]), memAddr + '_e' + jsonHash(c[1]),
+                true /* isSymbolKey */)
+            )} />;
   } else if (obj[0] === 'CLASS') {
     // class    - ['CLASS', class name, [list of superclass names], [attr1, value1], [attr2, value2], ..., [attrN, valueN]]
-    // ret =
+    var label = obj[1] + " class";
+    var superclassNames = obj[2];
+    if (superclassNames.length > 0) {
+      label += (' [extends ' + superclassNames.join(', ') + ']');
+    }
+    ret = <RCollection layout="VerticalLayout"
+            name={label}
+            elts={_.rest(obj, 3).map((c, i) =>
+              createKeyValueRMemBlock(
+                c[0], c[1],
+                memAddr + '_e' + jsonHash(c[0]), memAddr + '_e' + jsonHash(c[1]),
+                true /* isSymbolKey */)
+            )} />;
   } else if (obj[0] === 'FUNCTION') {
     // function - ['FUNCTION', function name, parent frame ID (for nested functions)]
-    // TODO: support parent frame ID
     console.assert(obj.length === 3);
-    ret = <RSymbol typeTag="function" data={obj[1]} />;
+    var funcName = obj[1];
+    if (obj[2]) {
+      funcName += (' [parent=' + obj[2] + ']');
+    }
+    ret = <RSymbol typeTag="function" data={funcName} />;
   } else if (obj[0] === 'module') {
     // module   - ['module', module name]
     console.assert(obj.length === 2);
@@ -320,15 +338,23 @@ function createRMemBlock(obj, memAddr, index=null, isVertical=true) {
   );
 }
 
+// returns a RMemBlock with a key-value pair;
+// use isSymbolKey to make key into a simple RSymbol
 function createKeyValueRMemBlock(key, value,
                                  keyMemAddr, valueMemAddr,
+                                 isSymbolKey=false,
                                  isVertical=false) {
   console.assert(keyMemAddr);
   console.assert(valueMemAddr);
 
-  var keyObj = isPrimitiveType(key) ?
-    createRosettaPrimitive(key) :
-    createRosettaCompoundObject(key, keyMemAddr);
+  var keyObj;
+  if (isSymbolKey) {
+    keyObj = <RSymbol data={key} />;
+  } else {
+    keyObj = isPrimitiveType(key) ?
+      createRosettaPrimitive(key) :
+      createRosettaCompoundObject(key, keyMemAddr);
+  }
 
   var valueObj = isPrimitiveType(value) ?
     createRosettaPrimitive(value) :

@@ -198,12 +198,15 @@ function createRosettaPrimitive(obj) {
 }
 
 // TODO: specialize for each language ...
-// returns a RMemBlock
-function createRosettaObject(obj, memAddr=null) {
+// returns a RMemBlock that wraps obj, located at memAddr
+function createRMemBlock(obj, memAddr) {
+  console.assert(memAddr); // should have a valid address!
   if (isPrimitiveType(obj)) {
     var prim = createRosettaPrimitive(obj);
+    // NB: key and valueMemAddr seem redundant but they're both necessary
+    // since 'key' isn't part of this.props; it's for React internals
     return (
-      <RMemBlock isVertical={true} key={memAddr} v={prim} />
+      <RMemBlock isVertical={true} v={prim} key={memAddr} valueMemAddr={memAddr} />
     );
   } else {
     return createRosettaCompoundObject(obj, memAddr);
@@ -217,21 +220,23 @@ function createRosettaCompoundObject(obj, memAddr) {
   console.assert(typeof obj == "object");
   if (obj[0] === 'REF') {
     console.assert(obj.length === 2);
-    ret = <RPointer typeTag="ref" data={{start: '??? ' + memAddr, end: 'obj_' + obj[1]}} />;
+    ret = <RPointer
+            typeTag="ref"
+            data={{start: '??? ' + memAddr, end: 'obj_' + obj[1]}} />;
   } else if (obj[0] === 'LIST') {
     // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
+    // use the list index as the faux memory address
     ret = <RCollection layout="HorizontalLayout"
             name="list"
             elts={_.rest(obj).map((c, i) =>
-              createRosettaObject(c,
-                memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
+              createRMemBlock(c, String(memAddr) + '_e' + String(i)))} />;
   } else if (obj[0] === 'TUPLE') {
     // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
+    // use the tuple index as the faux memory address
     ret = <RCollection layout="HorizontalLayout"
             name="tuple"
             elts={_.rest(obj).map((c, i) =>
-              createRosettaObject(c,
-                memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
+              createRMemBlock(c, String(memAddr) + '_e' + String(i)))} />;
   } else if (obj[0] === 'SET') {
     // set      - ['SET', elt1, elt2, elt3, ..., eltN]
     // TODO: heuristically compute ncols based on size of set
@@ -260,38 +265,44 @@ function createRosettaCompoundObject(obj, memAddr) {
   } else {
     // other    - [<type name>, string representation of object]
     console.assert(obj.length === 2);
-    var typeName = obj[0];
-    var stringRepr = obj[1];
     ret = <RSymbol typeTag={obj[0]} data={obj[1]} />;
   }
 
   console.assert(ret);
   // wrap in a RMemBlock ...
+  // NB: key and valueMemAddr seem redundant but they're both necessary
+  // since 'key' isn't part of this.props; it's for React internals
   return (
-    <RMemBlock v={ret} valueMemAddr={memAddr} />
+    <RMemBlock v={ret} key={memAddr} valueMemAddr={memAddr} />
   );
 }
 
-// orderedVarnames is a list of variable names in order
-// varsToVals is a mapping of variable names to their encoded values
-function createFrameElements(orderedVarnames, varsToVals) {
-  // iterate in order!
-  var elts = orderedVarnames.map((c, i) => {
-    console.assert(_.has(varsToVals, c));
-    return (
-      <RMemBlock isVertical={false}
-        key={c}
-        k={<RSymbol data={c}/>}
-        v={createRosettaObject(varsToVals[c])} />
-    );
-  });
-  return elts;
+class AbstractFrame extends React.Component {
+  // orderedVarnames is a list of variable names in order
+  // varsToVals is a mapping of variable names to their encoded values
+  createFrameElements(orderedVarnames, varsToVals) {
+    // iterate in order!
+    var elts = orderedVarnames.map((c, i) => {
+      console.assert(_.has(varsToVals, c));
+      return (
+        <RMemBlock isVertical={false}
+          key={c}
+          k={<RSymbol data={c}/>}
+          v={createRMemBlock(varsToVals[c], this.getFrameID() + '_' + c)} />
+      );
+    });
+    return elts;
+  }
 }
 
-class GlobalFrame extends React.Component {
+class GlobalFrame extends AbstractFrame {
+  getFrameID() {
+    return 'global_frame';
+  }
+
   render() {
-    var frameElts = createFrameElements(this.props.ordered_globals,
-                                        this.props.globals);
+    var frameElts = this.createFrameElements(this.props.ordered_globals,
+                                             this.props.globals);
     return (
       // should be wrapped in a RMemBlock so that environment/frame
       // pointers can point to it
@@ -300,16 +311,20 @@ class GlobalFrame extends React.Component {
           name="Global frame"
           elts={frameElts} />
         }
-        valueMemAddr={'frame_global'}
+        valueMemAddr={this.getFrameID()}
       />
     );
   }
 }
 
-class StackFrame extends React.Component {
+class StackFrame extends AbstractFrame {
+  getFrameID() {
+    return 'stack_frame_f' + this.props.data.frame_id;
+  }
+
   render() {
-    var frameElts = createFrameElements(this.props.data.ordered_varnames,
-                                        this.props.data.encoded_locals);
+    var frameElts = this.createFrameElements(this.props.data.ordered_varnames,
+                                             this.props.data.encoded_locals);
     return (
       // should be wrapped in a RMemBlock so that environment/frame
       // pointers can point to it
@@ -318,7 +333,7 @@ class StackFrame extends React.Component {
           name={this.props.data.func_name}
           elts={frameElts} />
         }
-        valueMemAddr={'frame_' + this.props.data.frame_id}
+        valueMemAddr={this.getFrameID()}
       />
     );
   }
@@ -327,19 +342,19 @@ class StackFrame extends React.Component {
 class Stack extends React.Component {
   render() {
     // first render globals, and then render each stack frame in order
-    // each StackFrame should have a unique frame ID to use as the key
+    // each StackFrame should have a unique frame_id to use as the key
+    //
+    // use frame_id as part of the unique sort key (which is for React's
+    // object constancy and *not* part of the object's props!)
     return (
       <div>
         <div key={"stackLabel"}>Frames</div>
+        <GlobalFrame globals={this.props.data.globals}
+                     ordered_globals={this.props.data.ordered_globals}
+                     key={"global_frame"} />
 
-        <div key={"global_frame"} style={myStyle.stackFrame}>
-          <GlobalFrame globals={this.props.data.globals}
-                       ordered_globals={this.props.data.ordered_globals} />
-        </div>
         {this.props.data.stack_to_render.map((c, i) =>
-          <div key={"stack_frame_id" + c.frame_id} style={myStyle.stackFrame}>
-            <StackFrame data={c} />
-          </div>
+          <StackFrame data={c} key={'stack_frame_f' + c.frame_id} />
         )}
       </div>
     );
@@ -352,20 +367,19 @@ class Heap extends React.Component {
   //
   // TODO: define clearer nesting vs. external pointing rules
   //
-  // TODO: make a better key for heap rows ...
-  // - maybe using the ID of the FIRST object in the row would be a good key,
-  //   since it wouldn't change if more objects are appended to that row?
-  //   (that way, the row would be removed if that object disappears,
-  //   which is sensible)
+  // for now, use the ID of the FIRST heap object in the row as the key,
+  // since it wouldn't change if more objects are appended later in that row.
+  // this way, a row would be removed from the virtual DOM only if that first
+  // object disappears, which is sensible.
   render() {
     return (
       <div>
         <div key={"heapLabel"}>Objects</div>
-        {_.keys(this.props.data).map((c, i) =>
-          <div key={i} style={myStyle.heapRow}>
-            {createRosettaObject(this.props.data[c], c)}
-          </div>)
-        }
+        {_.keys(this.props.data).map((heapID, i) =>
+          <div key={'heap_id_' + heapID} style={myStyle.heapRow}>
+            {createRMemBlock(this.props.data[heapID], heapID)}
+          </div>
+        )}
       </div>
     );
   }

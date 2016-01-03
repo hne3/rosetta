@@ -3,7 +3,7 @@
 import React from 'react';
 
 import {RNumber, RString, RSymbol, RPointer} from 'rprimitive';
-import {RElement} from 'relement';
+import {RMemBlock} from 'rmemblock';
 import {RCollection} from 'rcollection';
 
 // wow command-line bullshittery:
@@ -157,6 +157,7 @@ function getRefID(obj) {
 
 // obj is an encoded object from the backend
 // TODO: specialize for the vocabulary and types in each programming language
+// returns an instance of RPrimitive (or one of its subclasses)
 function createRosettaPrimitive(obj) {
   var typ = typeof obj;
   var ret;
@@ -197,15 +198,35 @@ function createRosettaPrimitive(obj) {
 }
 
 // TODO: specialize for each language ...
-function createRosettaObject(obj) {
+// returns an RCollection or RElement (a han solo element), but NEVER an
+// RPrimitive, since primitives can't exist on the heap; they must be
+// contained within something else
+function createRosettaObject(memAddr, obj, wrapPrimitive=false) {
   if (isPrimitiveType(obj)) {
-    return createRosettaPrimitive(obj);
+    var prim = createRosettaPrimitive(obj);
+    return (wrapPrimitive ?
+      // wrap primitive in an RMemBlock with memAddr as the key
+      <RMemBlock isVertical={true} key={memAddr} v={prim} /> :
+      prim
+    );
   } else {
-    return createRosettaCompoundObject(obj);
+    return createRosettaCompoundObject(memAddr, obj);
   }
 }
 
-function createRosettaCompoundObject(obj) {
+// A HA!!! the solution to all this nastiness is that EVERYTHING should
+// be contained within an element, even a collection, so the heap should
+// have ONLY elements at the top level.
+
+// returns an RCollection or RElement (a han solo element), but NEVER an
+// RPrimitive, since primitives can't exist alone on the heap; they must be
+// contained within something else
+function createRosettaHeapObject(memAddr, obj) {
+  return createRosettaObject(memAddr, obj, true /* wrapPrimitive */);
+}
+
+// returns an RCollection or RElement (a han solo element), but NEVER an RPrimitive
+function createRosettaCompoundObject(memAddr, obj) {
   var ret = undefined;
 
   console.assert(typeof obj == "object");
@@ -265,9 +286,10 @@ function createFrameElements(orderedVarnames, varsToVals) {
   var elts = orderedVarnames.map((c, i) => {
     console.assert(_.has(varsToVals, c));
     return (
-      <RElement isVertical={false} key={c}
+      <RMemBlock isVertical={false}
+        key={c}
         k={<RSymbol data={c}/>}
-        v={<RSymbol data={createRosettaObject(varsToVals[c])}/>} />
+        v={createRosettaObject(varsToVals[c])} />
     );
   });
   return elts;
@@ -278,9 +300,15 @@ class GlobalFrame extends React.Component {
     var frameElts = createFrameElements(this.props.ordered_globals,
                                         this.props.globals);
     return (
-      <RCollection layout="VerticalLayout"
-        name="Global frame"
-        elts={frameElts} />
+      // should be wrapped in a RMemBlock so that environment/frame
+      // pointers can point to it; TODO:
+      <RMemBlock isVertical={true} v={
+        <RCollection layout="VerticalLayout"
+          name="Global frame"
+          elts={frameElts} />
+        }
+        valueMemAddr={'frame_global'}
+      />
     );
   }
 }
@@ -290,9 +318,15 @@ class StackFrame extends React.Component {
     var frameElts = createFrameElements(this.props.data.ordered_varnames,
                                         this.props.data.encoded_locals);
     return (
-      <RCollection layout="VerticalLayout"
-        name={this.props.data.func_name}
-        elts={frameElts} />
+      // should be wrapped in a RMemBlock so that environment/frame
+      // pointers can point to it; TODO:
+      <RMemBlock isVertical={true} v={
+        <RCollection layout="VerticalLayout"
+          name={this.props.data.func_name}
+          elts={frameElts} />
+        }
+        valueMemAddr={'frame_' + this.props.data.frame_id}
+      />
     );
   }
 }
@@ -336,7 +370,9 @@ class Heap extends React.Component {
       <div>
         <div key={"heapLabel"}>Objects</div>
         {_.keys(this.props.data).map((c, i) =>
-          <div key={i} style={myStyle.heapRow}>{createRosettaObject(this.props.data[c])}</div>)
+          <div key={i} style={myStyle.heapRow}>
+            {createRosettaHeapObject(c, this.props.data[c])}
+          </div>)
         }
       </div>
     );

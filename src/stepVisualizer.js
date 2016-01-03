@@ -222,20 +222,23 @@ function createRosettaCompoundObject(obj, memAddr) {
     // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
     ret = <RCollection layout="HorizontalLayout"
             name="list"
-            elts={_.rest(obj).map((c, i) => createRosettaObject(c,
-              memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
+            elts={_.rest(obj).map((c, i) =>
+              createRosettaObject(c,
+                memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
   } else if (obj[0] === 'TUPLE') {
     // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
     ret = <RCollection layout="HorizontalLayout"
             name="tuple"
-            elts={_.rest(obj).map((c, i) => createRosettaObject(c,
-              memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
+            elts={_.rest(obj).map((c, i) =>
+              createRosettaObject(c,
+                memAddr ? String(memAddr) + '_e' + String(i) : null))} />;
   } else if (obj[0] === 'SET') {
     // set      - ['SET', elt1, elt2, elt3, ..., eltN]
     // TODO: heuristically compute ncols based on size of set
   } else if (obj[0] === 'DICT') {
     // dict     - ['DICT', [key1, value1], [key2, value2], ..., [keyN, valueN]]
     // ret =
+    // TODO: how about creating a RMemBlock with isVertical = false?
   } else if (obj[0] === 'INSTANCE') {
     // instance with __str__ defined - ['INSTANCE_PPRINT', class name, <__str__ value>]
     // ret =

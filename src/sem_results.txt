@@ -1,0 +1,4 @@
+{
+  "code": "#include <semaphore.h>\n#include <stddef.h>\n#include <fcntl.h>\n\nsem_t *sem;\n\nint main(int argc, char *argv[])\n{\n  sem = (sem_t *)calloc(1, sizeof(sem_t));\n  \n  if(sem_init(sem, 0, 0) < 0)\n    {\n      perror(\"seminit\");\n      exit(1);\n    }\n\n  printf(\"Traffic light appears\\n\");\n\n  if(sem_post(sem) < 0)\n    {\n      perror(\"sempost\");\n      exit(1);\n    }\n  printf(\"Traffic light is green\\n\");\n  if(sem_wait(sem) < 0)\n    {\n      perror(\"semwait\");\n      exit(1);\n    }\n  printf(\"Traffic light is red\\n\");\n  //if(sem_close(sem) < 0)\n  //{\n  //  perror(\"semclose\");\n      //exit(1);\n  //}\n  // printf(\"All traffic lights are out\\n\");\n  //if(sem_unlink(sem) < 0)\n  //{\n  //  perror(\"semunlink\");\n  //  exit(1);\n  //}\n  //printf(\"Traffic light has disappeared\\n\");\n}\n", 
+  "trace": []
+}

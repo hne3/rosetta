@@ -185,6 +185,10 @@ function createRosettaPrimitive(obj) {
     // special number object (???)
     ret = <RSymbol typeTag="number" data={obj[1]} />;
   }
+else if(typ === "semaphore")
+{
+    console.assert(true, "recognized semaphore");
+}
   else {
     console.assert(false);
   }

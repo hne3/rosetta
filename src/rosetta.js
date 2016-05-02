@@ -17,6 +17,12 @@ import 'd3';
 import {StepVisualizer} from 'stepVisualizer';
 
 
+// generated from hne3/opt-cpp-backend : semaphore-test
+var semStep = {
+  "code": "#include <semaphore.h>\n#include <stddef.h>\n#include <fcntl.h>\n\nsem_t *sem;\n\nint main(int argc, char *argv[])\n{\n  sem = (sem_t *)calloc(1, sizeof(sem_t));\n  \n  if(sem_init(sem, 0, 0) < 0)\n    {\n      perror(\"seminit\");\n      exit(1);\n    }\n\n  printf(\"Traffic light appears\\n\");\n\n  if(sem_post(sem) < 0)\n    {\n      perror(\"sempost\");\n      exit(1);\n    }\n  printf(\"Traffic light is green\\n\");\n  if(sem_wait(sem) < 0)\n    {\n      perror(\"semwait\");\n      exit(1);\n    }\n  printf(\"Traffic light is red\\n\");\n  //if(sem_close(sem) < 0)\n  //{\n  //  perror(\"semclose\");\n      //exit(1);\n  //}\n  // printf(\"All traffic lights are out\\n\");\n  //if(sem_unlink(sem) < 0)\n  //{\n  //  perror(\"semunlink\");\n  //  exit(1);\n  //}\n  //printf(\"Traffic light has disappeared\\n\");\n}\n", 
+  "trace": []
+}
+
 // to generate trace, run:
 // JSON.stringify(myVisualizer.curTrace[myVisualizer.curInstr])
 
@@ -36,7 +42,7 @@ var stepOop = {"ordered_globals":["Staff601","pat"],"stdout":"6.01\n34\n32\nProf
 // http://www.pythontutor.com/visualize.html#code=class+A%3A%0A++++x+%3D+1%0A++++y+%3D+'hello'%0A%0Aclass+B%3A%0A++++z+%3D+'bye'%0A%0Aclass+C(A,B%29%3A%0A++++def+salutation(self%29%3A%0A++++++++return+'%25d+%25s+%25s'+%25+(self.x,+self.y,+self.z%29%0A%0Ainst+%3D+C(%29%0Aprint(inst.salutation(%29%29%0Ainst.x+%3D+100%0Aprint(inst.salutation(%29%29&mode=display&origin=opt-frontend.js&cumulative=false&heapPrimitives=false&textReferences=false&py=2&rawInputLstJSON=%5B%5D&curInstr=12
 var stepOopInherit = {"ordered_globals":["A","B","C","inst"],"stdout":"1 hello bye\n","func_name":"salutation","stack_to_render":[{"frame_id":2,"encoded_locals":{"__return__":"100 hello bye","self":["REF",5]},"is_highlighted":true,"is_parent":false,"func_name":"salutation","is_zombie":false,"parent_frame_id_list":[],"unique_hash":"salutation_f2","ordered_varnames":["self","__return__"]}],"globals":{"A":["REF",1],"C":["REF",3],"B":["REF",2],"inst":["REF",5]},"heap":{"1":["CLASS","A",[],["x",1],["y","hello"]],"2":["CLASS","B",[],["z","bye"]],"3":["CLASS","C",["A","B"],["salutation",["REF",4]]],"4":["FUNCTION","salutation(self)",null],"5":["INSTANCE","C",["x",100]]},"line":10,"event":"return"};
 
-var sv = <StepVisualizer visualizerID={42} data={step21} />
+var sv = <StepVisualizer visualizerID={42} data={semStep} />
 //var sv = <StepVisualizer visualizerID={42} data={stepLast} />
 //var sv = <StepVisualizer visualizerID={42} data={stepOop} />
 //var sv = <StepVisualizer visualizerID={42} data={stepOopInherit} />

@@ -37,6 +37,7 @@ var brightRed = '#e93f34';
 var connectorBaseColor = '#005583';
 var connectorHighlightColor = brightRed;
 var connectorInactiveColor = '#cccccc';
+var current_stoplight = null;
 
 
 // TODO: maybe use custom events (e.g., a simple version of Flux?) to
@@ -185,10 +186,6 @@ function createRosettaPrimitive(obj) {
     // special number object (???)
     ret = <RSymbol typeTag="number" data={obj[1]} />;
   }
-else if(typ === "semaphore")
-{
-    console.assert(true, "recognized semaphore");
-}
   else {
     console.assert(false);
   }
@@ -218,7 +215,7 @@ function jsonHash(obj) {
 // returns an instance of RPrimitive or RCollection
 function createRosettaCompoundObject(obj, memAddr) {
   var ret = undefined;
-
+  
   console.assert(typeof obj == "object");
   if (obj[0] === 'REF') {
     console.assert(obj.length === 2);
@@ -226,7 +223,26 @@ function createRosettaCompoundObject(obj, memAddr) {
             typeTag="ref"
             data={{start: '??? ' + memAddr,
                    end:   'heap_obj_' + getRefID(obj)}} />;
-  } else if (obj[0] === 'LIST' || obj[0] === 'TUPLE') {
+  }else if (obj[0] == 'semaphore')
+    {
+	console.assert(obj.length === 3);
+	var semName = obj[1];
+	ret = <RSymbol typeTag="semaphore" data={semName} />;
+	if(obj[2] === 0)
+	    {
+		show_image("red_light.png", 300, 700, semName.top, semName.bottom, semName.left, semName.right);
+	    }
+	else if(obj[2] === 1)
+	{
+	    show_image("green_light.png", 300, 700, semName.top, semName.bottom, semName.left, semName.right);
+	}
+	else{
+	    show_image("yellow_light.png", 300, 700, semName.top, semName.bottom, semName.left, semName.right);
+	}
+
+	return ret;
+    }
+    else if (obj[0] === 'LIST' || obj[0] === 'TUPLE') {
     // list     - ['LIST', elt1, elt2, elt3, ..., eltN]
     // tuple    - ['TUPLE', elt1, elt2, elt3, ..., eltN]
     // use the index as the faux memory address
@@ -457,6 +473,26 @@ class Stack extends React.Component {
     );
   }
 }
+
+function show_image(src, width, height, top, bottom, left, right)
+{
+	// This code is modified from stackoverflow.com/question/5451445/how-to-display-image-with-javascript
+        if(current_stoplight != null)
+	    {
+		document.removeChild(current_stoplight);
+	    }
+	var img = document.createElement("img");
+	img.src = src;
+	img.width = width;
+	img.height = height;
+        img.top = top;
+        img.bottom = bottom;
+        img.left = left;
+        img.right = right;
+
+	current_stoplight = document.body.appendChild(img);
+ }
+
 
 class Heap extends React.Component {
   // just do a super-simple div-based vertical stacking layout for now; expand
